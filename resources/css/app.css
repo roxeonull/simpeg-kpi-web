@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    /* Palet identitas visual KPI Pusat — merah & emas kelembagaan, dengan
+       lapisan netral hangat yang lebih kaya untuk kebutuhan data-dense UI */
+    --color-kpi-red: #C1272D;
+    --color-kpi-red-dark: #84181C;
+    --color-kpi-red-soft: #F6E3E1;
+    --color-kpi-black: #1C1712;
+    --color-kpi-gold: #B4872A;
+    --color-kpi-gold-soft: #F1E4C3;
+    --color-kpi-cream: #F7F3EA;
+    --color-kpi-cream-soft: #EFE9DB;
+    --color-kpi-gray: #6B6459;
+    --color-kpi-line: #E7E0D2;
+    --color-kpi-dark-bg: #141210;
+    --color-kpi-dark-surface: #25211B;
+    --color-kpi-dark-surface-elevated: #2E2922;
+    --color-kpi-dark-line: #3D352B;
+
+    --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px -12px rgba(28, 23, 18, 0.10);
+    --shadow-card-hover: 0 2px 4px rgba(28, 23, 18, 0.06), 0 16px 32px -12px rgba(28, 23, 18, 0.16);
+
+    /* Animasi premium kustom */
+    --animate-mesh-drift: mesh-drift 18s ease infinite alternate;
+    --animate-float: float 7s ease-in-out infinite;
+    --animate-fade-in-up: fadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+
+    @keyframes mesh-drift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(0.5deg); }
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @keyframes pulse-glow {
+        0%, 100% { transform: scale(1); opacity: 0.45; }
+        50% { transform: scale(1.03); opacity: 0.65; }
+    }
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+    body {
+        @apply antialiased;
+    }
+    ::selection {
+        @apply bg-kpi-red/20;
+    }
+    :focus-visible {
+        @apply outline-none ring-2 ring-kpi-red/40 ring-offset-2 ring-offset-kpi-cream dark:ring-offset-kpi-dark-bg;
+    }
+}
+
+@layer components {
+    /* ---------- Badges ---------- */
+    .badge {
+        @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
+    }
+    .badge::before {
+        content: '';
+        @apply h-1.5 w-1.5 shrink-0 rounded-full bg-current;
+    }
+    .badge-success {
+        @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400;
+    }
+    .badge-warning {
+        @apply bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400;
+    }
+    .badge-danger {
+        @apply bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400;
+    }
+    .badge-info {
+        @apply bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-400;
+    }
+    .badge-default {
+        @apply bg-stone-100 text-stone-600 dark:bg-white/10 dark:text-stone-300;
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-kpi-red px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-kpi-red-dark hover:shadow active:scale-[.98] disabled:pointer-events-none disabled:opacity-50;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-kpi-black transition hover:border-stone-400 hover:bg-stone-50 active:scale-[.98] dark:border-white/10 dark:bg-white/5 dark:text-stone-100 dark:hover:bg-white/10;
+    }
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 active:scale-[.98];
+    }
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-kpi-gray transition hover:bg-stone-200/60 hover:text-kpi-black dark:hover:bg-white/10 dark:hover:text-stone-100;
+    }
+
+    /* ---------- Compact Table Action Buttons ---------- */
+    .btn-xs-secondary {
+        @apply inline-flex items-center gap-1 rounded-lg border border-kpi-line px-2.5 py-1.5 text-xs font-medium text-kpi-black transition-colors hover:border-kpi-red hover:text-kpi-red dark:border-white/10 dark:text-stone-300 dark:hover:border-white/20 dark:hover:text-rose-400;
+    }
+    .btn-xs-danger {
+        @apply inline-flex items-center gap-1 rounded-lg border border-rose-200 px-2.5 py-1.5 text-xs font-medium text-rose-600 transition-colors hover:border-rose-400 hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-400 dark:hover:bg-rose-500/10;
+    }
+    .btn-xs-warning {
+        @apply inline-flex items-center gap-1 rounded-lg border border-amber-200 px-2.5 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:border-amber-400 hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10;
+    }
+    .btn-xs-success {
+        @apply inline-flex items-center gap-1 rounded-lg border border-emerald-200 px-2.5 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:border-emerald-400 hover:bg-emerald-50 dark:border-emerald-500/30 dark:text-emerald-400 dark:hover:bg-emerald-500/10;
+    }
+
+    /* ---------- Surfaces ---------- */
+    .card {
+        @apply rounded-2xl border border-kpi-line bg-white/80 p-5 shadow-[var(--shadow-card)] backdrop-blur-md transition-all duration-300 dark:border-white/12 dark:bg-kpi-dark-surface dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)];
+    }
+    .card-hover {
+        @apply hover:shadow-[var(--shadow-card-hover)];
+    }
+    .panel {
+        @apply rounded-2xl border border-kpi-line bg-white/80 backdrop-blur-md dark:border-white/12 dark:bg-kpi-dark-surface;
+    }
+    .eyebrow {
+        @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-kpi-gray dark:text-stone-400;
+    }
+    .stat-figure {
+        @apply font-serif text-[2rem] font-semibold leading-none tracking-tight text-kpi-black dark:text-stone-100;
+    }
+    .mono {
+        font-family: var(--font-mono);
+    }
+
+    /* ---------- Forms ---------- */
+    .input {
+        @apply w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm text-kpi-black placeholder-stone-400 shadow-sm transition focus:border-kpi-red focus:outline-none focus:ring-2 focus:ring-kpi-red/15 dark:border-white/15 dark:bg-white/5 dark:text-stone-100 dark:placeholder-stone-500;
+    }
+    .label {
+        @apply mb-1.5 block text-sm font-medium text-stone-700 dark:text-stone-300;
+    }
+    .field-hint {
+        @apply mt-1.5 text-xs text-kpi-gray dark:text-stone-400;
+    }
+
+    /* ---------- Tables ---------- */
+    .table-shell {
+        @apply overflow-x-auto rounded-2xl border border-kpi-line bg-white shadow-[var(--shadow-card)] dark:border-white/12 dark:bg-kpi-dark-surface;
+    }
+    .th {
+        @apply px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wider text-kpi-gray dark:text-stone-400;
+    }
+    .td {
+        @apply px-4 py-3.5 text-sm;
+    }
+    .tr-hover {
+        @apply transition-colors hover:bg-kpi-cream/60 dark:hover:bg-white/[0.04];
+    }
+
+    /* ---------- Empty state ---------- */
+    .empty-state {
+        @apply flex flex-col items-center justify-center gap-2 px-4 py-14 text-center;
+    }
+
+    /* ---------- Official seal / emblem ---------- */
+    .seal {
+        @apply relative flex shrink-0 items-center justify-center rounded-full;
+        background: radial-gradient(circle at 32% 28%, var(--color-kpi-red-dark), var(--color-kpi-black) 78%);
+        box-shadow: inset 0 0 0 1.5px rgba(212, 175, 91, 0.55), inset 0 0 0 4px rgba(28, 23, 18, 0.9), 0 2px 6px rgba(28,23,18,.25);
+    }
+    .seal::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        border-radius: 9999px;
+        border: 1px dashed rgba(212, 175, 91, 0.45);
+    }
+
+    /* ---------- Timeline (activity feed / approval trail) ---------- */
+    .timeline-item {
+        @apply relative pb-6 pl-6 last:pb-0;
+    }
+    .timeline-item::before {
+        content: '';
+        @apply absolute left-[3px] top-1.5 h-2 w-2 rounded-full bg-kpi-gold ring-4 ring-kpi-gold-soft dark:ring-kpi-gold/20;
+    }
+    .timeline-item::after {
+        content: '';
+        @apply absolute left-[7px] top-4 bottom-0 w-px bg-kpi-line dark:bg-white/10;
+    }
+    .timeline-item:last-child::after {
+        content: none;
+    }
+
+    /* ---------- Glassmorphism Card ---------- */
+    .glass-card {
+        @apply backdrop-blur-xl bg-white/75 border border-kpi-line dark:bg-kpi-dark-surface/75 dark:border-white/10 shadow-[var(--shadow-card)];
+    }
+    .glass-panel {
+        @apply backdrop-blur-xl bg-kpi-cream/80 border border-kpi-line dark:bg-kpi-dark-bg/85 dark:border-white/10;
+    }
+
+    /* ---------- Input Glow Effects ---------- */
+    .input-glow {
+        @apply transition duration-300 focus:border-kpi-red focus:shadow-[0_0_15px_-3px_rgba(193,39,45,0.25)] focus:ring-2 focus:ring-kpi-red/20;
+    }
+
+    /* ---------- Gradient Mesh Panel ---------- */
+    .bg-gradient-mesh {
+        background-color: #15130f;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(193, 39, 45, 0.22) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(180, 135, 42, 0.18) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(132, 24, 28, 0.25) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(28, 23, 18, 0.9) 0px, transparent 50%);
+        background-size: 200% 200%;
+    }
+
+    /* ---------- Glow metric cards ---------- */
+    .card-glow-red {
+        @apply shadow-[0_0_20px_-5px_rgba(193,39,45,0.12),var(--shadow-card)] border-l-4 border-l-kpi-red! hover:shadow-[0_12px_28px_rgba(193,39,45,0.14)]!;
+    }
+    .card-glow-emerald {
+        @apply shadow-[0_0_20px_-5px_rgba(16,185,129,0.12),var(--shadow-card)] border-l-4 border-l-emerald-500! hover:shadow-[0_12px_28px_rgba(16,185,129,0.14)]!;
+    }
+    .card-glow-amber {
+        @apply shadow-[0_0_20px_-5px_rgba(245,158,11,0.12),var(--shadow-card)] border-l-4 border-l-kpi-gold! hover:shadow-[0_12px_28px_rgba(245,158,11,0.14)]!;
+    }
+    .card-glow-sky {
+        @apply shadow-[0_0_20px_-5px_rgba(14,165,233,0.12),var(--shadow-card)] border-l-4 border-l-sky-500! hover:shadow-[0_12px_28px_rgba(14,165,233,0.14)]!;
+    }
+
+    /* ---------- Staggered entrance class ---------- */
+    .animate-fade-in-up {
+        animation: fadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+}
