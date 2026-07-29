@@ -34,7 +34,7 @@ class ProfileApiController extends Controller
         abort_unless($pegawai, 404);
 
         $data = $request->validate([
-            'field' => ['required', 'in:no_hp,alamat,email,email_pribadi,nama_panggilan,status_marital,golongan_darah,agama,hobi'],
+            'field' => ['required', 'in:no_hp,alamat,email,email_pribadi,nama_panggilan,status_marital,golongan_darah,agama,hobi,koordinat_domisili'],
             'nilai_baru' => ['required', 'string', 'max:500'],
         ]);
 
@@ -84,6 +84,9 @@ class ProfileApiController extends Controller
             'kota' => $pegawai->kota,
             'provinsi' => $pegawai->provinsi,
             'kode_pos' => $pegawai->kode_pos,
+            'koordinat_domisili' => $pegawai->koordinat_domisili,
+            'lat_domisili' => $pegawai->lat_domisili,
+            'lng_domisili' => $pegawai->lng_domisili,
 
             // Kepegawaian
             'nip' => $pegawai->nip,

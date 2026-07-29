@@ -20,7 +20,7 @@ class Pegawai extends Model
         'gelar_depan', 'gelar_belakang', 'nama_panggilan', 'tempat_lahir', 'tanggal_lahir',
         'jenis_kelamin', 'golongan_darah', 'agama', 'status_marital', 'pendidikan_terakhir',
         'jurusan_pendidikan', 'universitas', 'email_pribadi', 'telepon', 'fax',
-        'kelurahan', 'kecamatan', 'kota', 'provinsi', 'kode_pos',
+        'kelurahan', 'kecamatan', 'kota', 'provinsi', 'kode_pos', 'koordinat_domisili', 'lat_domisili', 'lng_domisili',
 
         // Data Kepegawaian
         'tipe_pegawai', 'jabatan_plt', 'jabatan_plh', 'tmt_cpns', 'tmt_pns',

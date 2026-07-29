@@ -93,6 +93,59 @@
                         </div>
                     </div>
 
+                    {{-- ── Mode WFH & Presensi Domisili ── --}}
+                    <div class="border-t border-kpi-line dark:border-white/10 pt-5 mt-5">
+                        <div class="flex items-center gap-2 mb-4">
+                            <svg class="h-4 w-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            <h4 class="font-semibold text-sm text-kpi-black dark:text-stone-100">Sistem Work From Home (WFH) &amp; Domisili</h4>
+                        </div>
+
+                        {{-- Toggle WFH System --}}
+                        <div class="rounded-xl border border-kpi-line dark:border-white/10 p-4 bg-stone-50/50 dark:bg-white/[0.02] mb-4">
+                            <label class="flex items-start gap-3 cursor-pointer" for="wfh_enabled">
+                                <div class="mt-0.5 relative">
+                                    <input type="hidden" name="wfh_enabled" value="0">
+                                    <input type="checkbox" id="wfh_enabled" name="wfh_enabled"
+                                        value="1" {{ $wfhEnabled ? 'checked' : '' }}
+                                        class="sr-only peer">
+                                    <div class="w-10 h-5 bg-stone-300 dark:bg-white/20 rounded-full peer-checked:bg-emerald-600 transition-colors duration-200"></div>
+                                    <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-kpi-black dark:text-stone-100">Aktifkan Mode WFH Berbasis Domisili</p>
+                                    <p class="text-[11px] text-kpi-gray mt-0.5 leading-relaxed">
+                                        Jika aktif: pada hari-hari WFH yang dipilih di bawah, acuan radius GPS absensi pegawai otomatis berpindah ke titik koordinat domisili pegawai yang telah disetujui.
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- Simple & Clean Checkbox Selector for WFH Days --}}
+                        <div>
+                            <label class="label mb-2">Pilih Hari Pelaksanaan WFH</label>
+                            @php
+                                $daysList = [
+                                    'monday' => 'Senin',
+                                    'tuesday' => 'Selasa',
+                                    'wednesday' => 'Rabu',
+                                    'thursday' => 'Kamis',
+                                    'friday' => 'Jumat',
+                                    'saturday' => 'Sabtu',
+                                    'sunday' => 'Minggu',
+                                ];
+                            @endphp
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                @foreach($daysList as $dayKey => $dayName)
+                                    @php $isChecked = in_array($dayKey, $wfhDays); @endphp
+                                    <label class="flex items-center gap-3 rounded-2xl border border-kpi-line bg-white dark:bg-kpi-dark-surface dark:border-white/10 p-3.5 cursor-pointer hover:bg-stone-50 dark:hover:bg-white/5 transition-all">
+                                        <input type="checkbox" name="wfh_days[]" value="{{ $dayKey }}" {{ $isChecked ? 'checked' : '' }} class="h-4.5 w-4.5 rounded border-stone-300 text-kpi-red focus:ring-kpi-red cursor-pointer shrink-0">
+                                        <span class="text-xs font-bold text-kpi-black dark:text-stone-100">{{ $dayName }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- ── Jam Kerja Shift ── --}}
                     <div class="border-t border-kpi-line dark:border-white/10 pt-5 mt-1">
                         <div class="flex items-center gap-2 mb-4">

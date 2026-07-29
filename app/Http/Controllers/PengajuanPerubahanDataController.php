@@ -26,7 +26,18 @@ class PengajuanPerubahanDataController extends Controller
 
     public function setujui(Request $request, PengajuanPerubahanData $pengajuan)
     {
-        $pengajuan->pegawai->update([$pengajuan->field => $pengajuan->nilai_baru]);
+        if ($pengajuan->field === 'koordinat_domisili' && !empty($pengajuan->nilai_baru)) {
+            $parts = explode(',', $pengajuan->nilai_baru);
+            $lat = isset($parts[0]) ? (float) trim($parts[0]) : null;
+            $lng = isset($parts[1]) ? (float) trim($parts[1]) : null;
+            $pengajuan->pegawai->update([
+                'koordinat_domisili' => $pengajuan->nilai_baru,
+                'lat_domisili' => $lat,
+                'lng_domisili' => $lng,
+            ]);
+        } else {
+            $pengajuan->pegawai->update([$pengajuan->field => $pengajuan->nilai_baru]);
+        }
         $pengajuan->update([
             'status' => 'disetujui',
             'diproses_oleh' => $request->user()->id,

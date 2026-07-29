@@ -44,6 +44,10 @@ class PengaturanController extends Controller
             'kuotaCuti' => $p('kuota_cuti_tahunan', '12'),
             'targetJp'  => $p('target_jp_tahunan', '20'),
 
+            // WFH & Domisili
+            'wfhEnabled' => (bool) $p('wfh_enabled', '1'),
+            'wfhDays'    => json_decode($p('wfh_days', '["friday"]'), true) ?? ['friday'],
+
             // Master data
             'units'               => UnitKerja::orderBy('nama_unit')->get(),
             'jabatans'            => Jabatan::orderBy('nama_jabatan')->get(),
@@ -81,10 +85,17 @@ class PengaturanController extends Controller
             // Cuti & Diklat
             'kuota_cuti_tahunan' => ['required', 'integer', 'min:1'],
             'target_jp_tahunan'  => ['required', 'integer', 'min:1'],
+
+            // WFH & Domisili
+            'wfh_enabled' => ['nullable'],
+            'wfh_days'    => ['nullable', 'array'],
+            'wfh_days.*'  => ['string', 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday'],
         ]);
 
         // Checkbox boolean — jika tidak dikirim, berarti false
         $data['flexible_work_hours_enabled'] = $request->has('flexible_work_hours_enabled') ? '1' : '0';
+        $data['wfh_enabled'] = $request->has('wfh_enabled') ? '1' : '0';
+        $data['wfh_days'] = json_encode($request->input('wfh_days', ['friday']));
 
         // Simpan semua key ke tabel pengaturans
         foreach ($data as $key => $value) {

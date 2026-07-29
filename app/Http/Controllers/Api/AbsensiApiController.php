@@ -88,10 +88,28 @@ class AbsensiApiController extends Controller
         $existing = $pegawai->absensi()->whereDate('tanggal', now()->toDateString())->first();
         abort_if($existing && $existing->jam_masuk, 422, 'Anda sudah presensi masuk hari ini.');
 
-        // Validasi GPS radius
-        $jarak  = $this->hitungJarak($data['latitude'], $data['longitude']);
+        $wfhEnabled = (bool) Pengaturan::get('wfh_enabled', '1');
+        $wfhDays = json_decode(Pengaturan::get('wfh_days', '["friday"]'), true) ?? ['friday'];
+        $dayNameLower = strtolower(now()->englishDayOfWeek);
+        $isHariWfh = $wfhEnabled && in_array($dayNameLower, $wfhDays);
+
         $radius = (float) Pengaturan::get('radius_gps', 100);
-        abort_if($jarak > $radius, 422, "Anda berada di luar radius kantor ({$jarak} m dari kantor, maksimal {$radius} m).");
+        $keteranganMasuk = 'Presensi masuk via mobile';
+        $wfhFlagNote = null;
+
+        if ($isHariWfh && $pegawai->lat_domisili && $pegawai->lng_domisili) {
+            $jarakDomisili = $this->hitungJarakTitik((float)$data['latitude'], (float)$data['longitude'], (float)$pegawai->lat_domisili, (float)$pegawai->lng_domisili);
+            if ($jarakDomisili <= $radius) {
+                $keteranganMasuk = 'Presensi masuk WFH (Di Domisili)';
+            } else {
+                $keteranganMasuk = "Presensi masuk WFH (Di Luar Domisili - {$jarakDomisili}m dari rumah)";
+                $wfhFlagNote = "Presensi WFH di luar radius domisili ({$jarakDomisili}m)";
+            }
+        } else {
+            // Validasi GPS radius kantor standar
+            $jarak = $this->hitungJarak($data['latitude'], $data['longitude']);
+            abort_if($jarak > $radius, 422, "Anda berada di luar radius kantor ({$jarak} m dari kantor, maksimal {$radius} m).");
+        }
 
         $hariIni    = now()->toDateString();
         $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
@@ -108,7 +126,7 @@ class AbsensiApiController extends Controller
         $fotoPath = $request->file('foto')->store('absensi', 'public');
 
         // ---------------------------------------------------------------
-        // Evaluasi indikasi GPS spoofing (observatif — tidak memblokir)
+        // Evaluasi indikasi GPS spoofing & WFH flag (observatif — tidak memblokir)
         // ---------------------------------------------------------------
         $isMock   = isset($data['is_mock_location']) ? (bool) $data['is_mock_location'] : null;
         $accuracy = isset($data['accuracy']) ? (float) $data['accuracy'] : null;
@@ -120,6 +138,11 @@ class AbsensiApiController extends Controller
             lat      : (float) $data['latitude'],
             lng      : (float) $data['longitude'],
         );
+
+        if ($wfhFlagNote) {
+            $flagReview = true;
+            $catatanFlag = trim(($catatanFlag ? $catatanFlag . '; ' : '') . $wfhFlagNote);
+        }
         // ---------------------------------------------------------------
 
         $absensi = Absensi::updateOrCreate(
@@ -130,10 +153,8 @@ class AbsensiApiController extends Controller
                 'latitude_masuk'       => $data['latitude'],
                 'longitude_masuk'      => $data['longitude'],
                 'status'               => $status,
-                'keterangan'           => 'Presensi masuk via mobile',
-                // Foto selfie disimpan di kolom terpisah (bukan di-embed ke teks keterangan)
+                'keterangan'           => $keteranganMasuk,
                 'foto_masuk'           => $fotoPath,
-                // Kolom GPS flag (null jika app lama tidak mengirim data)
                 'is_mock_location'     => $isMock,
                 'gps_accuracy'         => $accuracy,
                 'flag_review'          => $flagReview,
@@ -236,10 +257,15 @@ class AbsensiApiController extends Controller
         $kantorLat = (float) Pengaturan::get('kantor_lat', -6.211544);
         $kantorLng = (float) Pengaturan::get('kantor_lng', 106.845172);
 
+        return $this->hitungJarakTitik($lat, $lng, $kantorLat, $kantorLng);
+    }
+
+    private function hitungJarakTitik(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
         $earthRadius = 6371000;
-        $dLat = deg2rad($lat - $kantorLat);
-        $dLng = deg2rad($lng - $kantorLng);
-        $a = sin($dLat / 2) ** 2 + cos(deg2rad($kantorLat)) * cos(deg2rad($lat)) * sin($dLng / 2) ** 2;
+        $dLat = deg2rad($lat1 - $lat2);
+        $dLng = deg2rad($lng1 - $lng2);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat2)) * cos(deg2rad($lat1)) * sin($dLng / 2) ** 2;
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return round($earthRadius * $c);

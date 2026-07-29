@@ -82,6 +82,30 @@
         }
     @endphp
 
+    @php
+        $wfhEnabledWeb = (bool) \App\Models\Pengaturan::get('wfh_enabled', '1');
+        $wfhDaysWeb = json_decode(\App\Models\Pengaturan::get('wfh_days', '["friday"]'), true) ?? ['friday'];
+        $selectedDayName = strtolower(\Carbon\Carbon::parse($tanggal)->format('l'));
+        $isHariWfhWeb = $wfhEnabledWeb && in_array($selectedDayName, $wfhDaysWeb);
+    @endphp
+
+    @if($isHariWfhWeb)
+        <div class="mb-5 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/[0.04]">
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                </div>
+                <div>
+                    <h4 class="font-serif text-sm font-bold text-emerald-900 dark:text-emerald-300">Mode WFH (Work From Home) Aktif Hari Ini</h4>
+                    <p class="text-xs text-emerald-700 dark:text-emerald-400">Presensi pegawai pada hari {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }} dipandu oleh sistem radius koordinat domisili pegawai.</p>
+                </div>
+            </div>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 shrink-0">
+                🏡 Presensi Domisili
+            </span>
+        </div>
+    @endif
+
     {{-- Filter & Live Search Toolbar Container --}}
     <div class="relative z-40 mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
         <form method="GET" x-data="{ status: '{{ $filters['status'] ?? '' }}' }" class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
@@ -218,6 +242,11 @@
                             <td class="td text-kpi-gray">
                                 @if($a->jenisKetidakhadiran)
                                     <span class="inline-flex items-center rounded-lg bg-stone-100 dark:bg-white/5 px-2 py-0.5 text-xs font-semibold text-kpi-black dark:text-stone-300 mr-1 shadow-sm">{{ $a->jenisKetidakhadiran->nama }}</span>
+                                @endif
+                                @if(str_contains($a->keterangan ?? '', 'WFH') || $isHariWfhWeb)
+                                    <span class="inline-flex items-center gap-1 rounded-md bg-stone-100 dark:bg-white/10 px-2 py-0.5 text-xs font-bold text-stone-800 dark:text-stone-200 mr-1 border border-stone-200 dark:border-white/10">
+                                        🏡 WFH
+                                    </span>
                                 @endif
                                 <span class="text-xs">{{ $a->keterangan ?? '—' }}</span>
                             </td>

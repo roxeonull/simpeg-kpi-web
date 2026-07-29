@@ -9,6 +9,7 @@
         'golongan_darah' => 'Golongan Darah',
         'agama' => 'Agama',
         'hobi' => 'Hobi',
+        'koordinat_domisili' => 'Koordinat Titik Domisili WFH',
     ];
 
     $fieldOptions = [['value' => '', 'label' => 'Semua Field']];
