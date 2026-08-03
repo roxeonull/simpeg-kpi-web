@@ -37,11 +37,11 @@
         
         <a href="{{ route('cuti.index', array_merge(request()->except('page'), ['status' => 'menunggu'])) }}" 
            class="inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-all
-                  {{ $currentStatus === 'menunggu' 
+                  {{ in_array($currentStatus, ['menunggu', 'menunggu_atasan', 'menunggu_hr']) 
                      ? 'border-amber-500 bg-amber-500 text-white' 
                      : 'border-kpi-line bg-white/40 text-kpi-gray hover:bg-stone-50 dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10' }}">
             Menunggu
-            <span class="mono ml-1 px-1.5 py-0.5 rounded-full text-[10px] {{ $currentStatus === 'menunggu' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' }}">
+            <span class="mono ml-1 px-1.5 py-0.5 rounded-full text-[10px] {{ in_array($currentStatus, ['menunggu', 'menunggu_atasan', 'menunggu_hr']) ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-400' }}">
                 {{ $counts['menunggu'] }}
             </span>
         </a>
@@ -69,9 +69,9 @@
         </a>
     </div>
 
-    <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
-        <form method="GET" class="relative z-20 flex flex-wrap items-center gap-2">
-            <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama pegawai..." class="input max-w-xs">
+    <div class="relative z-20 mb-4 flex flex-wrap items-center justify-between gap-3 bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
+        <form method="GET" class="flex flex-1 flex-wrap items-center gap-2.5">
+            <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama pegawai..." class="input w-full sm:w-56">
             <x-select name="status" :value="$filters['status'] ?? ''" :options="[
                 ['value' => '', 'label' => 'Semua Status'],
                 ['value' => 'menunggu', 'label' => 'Menunggu (Semua)'],
@@ -79,18 +79,18 @@
                 ['value' => 'menunggu_hr', 'label' => 'Menunggu HR'],
                 ['value' => 'disetujui', 'label' => 'Disetujui'],
                 ['value' => 'ditolak', 'label' => 'Ditolak']
-            ]" class="w-full max-w-[180px]" />
+            ]" class="w-full sm:w-44" />
             @php
                 $jcOptions = [['value' => '', 'label' => 'Semua Jenis']];
                 foreach ($jenisCutis as $jc) {
                     $jcOptions[] = ['value' => (string)$jc->id, 'label' => $jc->nama];
                 }
             @endphp
-            <x-select name="jenis_cuti" :value="$filters['jenis_cuti'] ?? ''" :options="$jcOptions" class="w-full max-w-[180px]" />
+            <x-select name="jenis_cuti" :value="$filters['jenis_cuti'] ?? ''" :options="$jcOptions" class="w-full sm:w-52" />
             <button class="btn-secondary">Filter</button>
         </form>
 
-        <a href="{{ route('cuti.create') }}" class="btn-primary flex items-center gap-1.5 whitespace-nowrap shadow-[var(--shadow-card-hover)]">
+        <a href="{{ route('cuti.create') }}" class="btn-primary flex items-center gap-1.5 whitespace-nowrap shadow-[var(--shadow-card-hover)] shrink-0">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             Tambah Pengajuan
         </a>

@@ -50,6 +50,41 @@ class Cuti extends Model
         return $this->belongsTo(JenisCuti::class, 'jenis_cuti_id');
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (Cuti $cuti) {
+            if (!$cuti->jenis_cuti_id && $cuti->jenis_cuti) {
+                $map = [
+                    'tahunan' => 'Cuti Tahunan',
+                    'sakit' => 'Sakit/Cuti Sakit',
+                    'melahirkan' => 'Cuti Bersalin Anak Ke-1 s.d 2',
+                    'lainnya' => 'Cuti Alasan Penting',
+                ];
+                $targetNama = $map[$cuti->jenis_cuti] ?? null;
+                if ($targetNama) {
+                    $jc = JenisCuti::where('nama', $targetNama)->first();
+                    if ($jc) {
+                        $cuti->jenis_cuti_id = $jc->id;
+                    }
+                }
+            } elseif ($cuti->jenis_cuti_id && !$cuti->jenis_cuti) {
+                $jc = $cuti->jenisCuti ?: JenisCuti::find($cuti->jenis_cuti_id);
+                if ($jc) {
+                    $nameLower = strtolower($jc->nama);
+                    if (str_contains($nameLower, 'sakit')) {
+                        $cuti->jenis_cuti = 'sakit';
+                    } elseif (str_contains($nameLower, 'melahirkan') || str_contains($nameLower, 'bersalin')) {
+                        $cuti->jenis_cuti = 'melahirkan';
+                    } elseif (str_contains($nameLower, 'tahunan')) {
+                        $cuti->jenis_cuti = 'tahunan';
+                    } else {
+                        $cuti->jenis_cuti = 'lainnya';
+                    }
+                }
+            }
+        });
+    }
+
     public function setujuiAtasan(User $user, ?string $catatan = null): void
     {
         $this->update([

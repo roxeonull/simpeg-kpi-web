@@ -95,25 +95,27 @@
         </div>
 
         <div x-show="tab === 'daftar'">
-            <form method="GET" class="relative z-20 mb-4 flex flex-wrap items-center gap-2">
-                <input type="hidden" name="tab" value="daftar">
-                <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama pegawai..." class="input max-w-xs">
-                <x-select name="status_verifikasi" :value="$filters['status_verifikasi'] ?? ''" :options="[
-                    ['value' => '', 'label' => 'Semua Status Verifikasi'],
-                    ['value' => 'menunggu', 'label' => 'Menunggu'],
-                    ['value' => 'terverifikasi', 'label' => 'Terverifikasi'],
-                    ['value' => 'ditolak', 'label' => 'Ditolak']
-                ]" class="w-full max-w-[170px]" />
-                <x-select name="kategori" :value="$filters['kategori'] ?? ''" :options="[
-                    ['value' => '', 'label' => 'Semua Kategori'],
-                    ['value' => 'struktural', 'label' => 'Struktural'],
-                    ['value' => 'fungsional', 'label' => 'Fungsional'],
-                    ['value' => 'teknis', 'label' => 'Teknis'],
-                    ['value' => 'latsar', 'label' => 'Latsar'],
-                    ['value' => 'lainnya', 'label' => 'Lainnya']
-                ]" class="w-full max-w-[150px]" />
-                <button class="btn-secondary">Filter</button>
-            </form>
+            <div class="relative z-20 mb-4 flex flex-wrap items-center justify-between gap-3 bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
+                <form method="GET" class="flex flex-1 flex-wrap items-center gap-2.5">
+                    <input type="hidden" name="tab" value="daftar">
+                    <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama pegawai..." class="input w-full sm:w-56">
+                    <x-select name="status_verifikasi" :value="$filters['status_verifikasi'] ?? ''" :options="[
+                        ['value' => '', 'label' => 'Semua Status Verifikasi'],
+                        ['value' => 'menunggu', 'label' => 'Menunggu'],
+                        ['value' => 'terverifikasi', 'label' => 'Terverifikasi'],
+                        ['value' => 'ditolak', 'label' => 'Ditolak']
+                    ]" class="w-full sm:w-52" />
+                    <x-select name="kategori" :value="$filters['kategori'] ?? ''" :options="[
+                        ['value' => '', 'label' => 'Semua Kategori'],
+                        ['value' => 'struktural', 'label' => 'Struktural'],
+                        ['value' => 'fungsional', 'label' => 'Fungsional'],
+                        ['value' => 'teknis', 'label' => 'Teknis'],
+                        ['value' => 'latsar', 'label' => 'Latsar'],
+                        ['value' => 'lainnya', 'label' => 'Lainnya']
+                    ]" class="w-full sm:w-44" />
+                    <button class="btn-secondary">Filter</button>
+                </form>
+            </div>
 
             <div id="live-list-container" class="space-y-4">
                 <div class="table-shell">

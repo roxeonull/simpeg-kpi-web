@@ -36,9 +36,22 @@ class CutiController extends Controller
         }
 
         if ($jenis = $request->get('jenis_cuti')) {
-            $query->where(function ($q) use ($jenis) {
-                $q->where('jenis_cuti_id', $jenis)
-                  ->orWhere('jenis_cuti', $jenis);
+            $jenisCutiObj = \App\Models\JenisCuti::find($jenis);
+            $legacyKeys = [];
+            if ($jenisCutiObj) {
+                $nameLower = strtolower($jenisCutiObj->nama);
+                if (str_contains($nameLower, 'sakit')) $legacyKeys[] = 'sakit';
+                if (str_contains($nameLower, 'tahunan')) $legacyKeys[] = 'tahunan';
+                if (str_contains($nameLower, 'bersalin') || str_contains($nameLower, 'melahirkan')) $legacyKeys[] = 'melahirkan';
+                if (str_contains($nameLower, 'alasan penting') || str_contains($nameLower, 'lain')) $legacyKeys[] = 'lainnya';
+            }
+            $query->where(function ($q) use ($jenis, $legacyKeys) {
+                $q->where('jenis_cuti_id', $jenis);
+                if (!empty($legacyKeys)) {
+                    $q->orWhereIn('jenis_cuti', $legacyKeys);
+                } else {
+                    $q->orWhere('jenis_cuti', $jenis);
+                }
             });
         }
 

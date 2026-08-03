@@ -57,7 +57,7 @@
          x-transition:leave="transition ease-in duration-75"
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
-         class="absolute left-0 z-50 mt-1.5 max-h-60 w-full min-w-[200px] overflow-y-auto rounded-2xl border border-kpi-line bg-white/95 py-1.5 shadow-[var(--shadow-card-hover)] backdrop-blur-lg dark:border-white/10 dark:bg-kpi-dark-surface/95"
+         class="absolute left-0 z-50 mt-1.5 max-h-60 w-full min-w-full overflow-y-auto rounded-2xl border border-kpi-line bg-white/95 py-1.5 shadow-[var(--shadow-card-hover)] backdrop-blur-lg dark:border-white/10 dark:bg-kpi-dark-surface/95"
          x-cloak>
         <div class="px-1 space-y-0.5">
             <template x-for="opt in options" :key="opt.value">

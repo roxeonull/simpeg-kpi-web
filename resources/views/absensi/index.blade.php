@@ -13,153 +13,156 @@
         @endif
     </div>
 
-    {{-- Top Stat Cards Grid --}}
-    <div class="mb-6 grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5">
-        {{-- Hadir --}}
-        <div class="card !p-4 card-glow-emerald card-hover transition-all duration-300 group">
-            <div class="flex items-center justify-between">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Hadir</p>
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400">
-                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    {{-- Live List Container: Wraps all date-dependent cards & table for live AJAX updates --}}
+    <div id="live-list-container" class="space-y-6" x-data="absensiDetailModal()">
+        {{-- Top Stat Cards Grid --}}
+        <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5">
+            {{-- Hadir --}}
+            <div class="card !p-4 card-glow-emerald card-hover transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Hadir</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
                 </div>
+                <p class="stat-figure mt-2.5 !text-2xl font-bold text-emerald-700 dark:text-emerald-400">{{ $rekapHariIni['hadir'] }}</p>
             </div>
-            <p class="stat-figure mt-2.5 !text-2xl font-bold text-emerald-700 dark:text-emerald-400">{{ $rekapHariIni['hadir'] }}</p>
+
+            {{-- Telat --}}
+            <div class="card !p-4 card-glow-amber card-hover transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Telat</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <p class="stat-figure mt-2.5 !text-2xl font-bold text-amber-700 dark:text-amber-400">{{ $rekapHariIni['telat'] }}</p>
+            </div>
+
+            {{-- Izin/Sakit --}}
+            <div class="card !p-4 card-glow-sky card-hover transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Izin / Sakit</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <p class="stat-figure mt-2.5 !text-2xl font-bold text-sky-700 dark:text-sky-400">{{ $rekapHariIni['izin_sakit'] }}</p>
+            </div>
+
+            {{-- Alpa --}}
+            <div class="card !p-4 card-glow-red card-hover transition-all duration-300 group">
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Alpa</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/15 text-rose-600 dark:bg-rose-500/25 dark:text-rose-400">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </div>
+                <p class="stat-figure mt-2.5 !text-2xl font-bold text-rose-700 dark:text-rose-400">{{ $rekapHariIni['alpa'] }}</p>
+            </div>
+
+            {{-- Belum Presensi --}}
+            <div class="card !p-4 card-hover transition-all duration-300 group col-span-2 sm:col-span-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Belum Presensi</p>
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-500/15 text-stone-600 dark:bg-white/10 dark:text-stone-300">
+                        <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <p class="stat-figure mt-2.5 !text-2xl font-bold text-stone-600 dark:text-stone-400">{{ $rekapHariIni['belum_presensi'] }}</p>
+            </div>
         </div>
 
-        {{-- Telat --}}
-        <div class="card !p-4 card-glow-amber card-hover transition-all duration-300 group">
-            <div class="flex items-center justify-between">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Telat</p>
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400">
-                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        @php
+            $unitOptions = [['value' => '', 'label' => 'Semua Unit']];
+            foreach ($units as $unit) {
+                $unitOptions[] = ['value' => (string)$unit->id, 'label' => $unit->nama_unit];
+            }
+            $jkOptions = [['value' => '', 'label' => 'Semua Ketidakhadiran']];
+            foreach ($jenisKetidakhadirans as $jk) {
+                $jkOptions[] = ['value' => (string)$jk->id, 'label' => $jk->nama];
+            }
+        @endphp
+
+        @php
+            $wfhEnabledWeb = (bool) \App\Models\Pengaturan::get('wfh_enabled', '1');
+            $wfhDaysWeb = json_decode(\App\Models\Pengaturan::get('wfh_days', '["friday"]'), true) ?? ['friday'];
+            $selectedDayName = strtolower(\Carbon\Carbon::parse($tanggal)->format('l'));
+            $isHariWfhWeb = $wfhEnabledWeb && in_array($selectedDayName, $wfhDaysWeb);
+        @endphp
+
+        @if($isHariWfhWeb)
+            <div class="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/[0.04]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-serif text-sm font-bold text-emerald-900 dark:text-emerald-300">Mode WFH (Work From Home) Aktif Hari Ini</h4>
+                        <p class="text-xs text-emerald-700 dark:text-emerald-400">Presensi pegawai pada hari {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }} dipandu oleh sistem radius koordinat domisili pegawai.</p>
+                    </div>
                 </div>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 shrink-0">
+                    🏡 Presensi Domisili
+                </span>
             </div>
-            <p class="stat-figure mt-2.5 !text-2xl font-bold text-amber-700 dark:text-amber-400">{{ $rekapHariIni['telat'] }}</p>
-        </div>
-
-        {{-- Izin/Sakit --}}
-        <div class="card !p-4 card-glow-sky card-hover transition-all duration-300 group">
-            <div class="flex items-center justify-between">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Izin / Sakit</p>
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400">
-                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-            </div>
-            <p class="stat-figure mt-2.5 !text-2xl font-bold text-sky-700 dark:text-sky-400">{{ $rekapHariIni['izin_sakit'] }}</p>
-        </div>
-
-        {{-- Alpa --}}
-        <div class="card !p-4 card-glow-red card-hover transition-all duration-300 group">
-            <div class="flex items-center justify-between">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Alpa</p>
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/15 text-rose-600 dark:bg-rose-500/25 dark:text-rose-400">
-                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </div>
-            </div>
-            <p class="stat-figure mt-2.5 !text-2xl font-bold text-rose-700 dark:text-rose-400">{{ $rekapHariIni['alpa'] }}</p>
-        </div>
-
-        {{-- Belum Presensi --}}
-        <div class="card !p-4 card-hover transition-all duration-300 group col-span-2 sm:col-span-1">
-            <div class="flex items-center justify-between">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Belum Presensi</p>
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-500/15 text-stone-600 dark:bg-white/10 dark:text-stone-300">
-                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-            </div>
-            <p class="stat-figure mt-2.5 !text-2xl font-bold text-stone-600 dark:text-stone-400">{{ $rekapHariIni['belum_presensi'] }}</p>
-        </div>
-    </div>
-
-    @php
-        $unitOptions = [['value' => '', 'label' => 'Semua Unit']];
-        foreach ($units as $unit) {
-            $unitOptions[] = ['value' => (string)$unit->id, 'label' => $unit->nama_unit];
-        }
-        $jkOptions = [['value' => '', 'label' => 'Semua Ketidakhadiran']];
-        foreach ($jenisKetidakhadirans as $jk) {
-            $jkOptions[] = ['value' => (string)$jk->id, 'label' => $jk->nama];
-        }
-    @endphp
-
-    @php
-        $wfhEnabledWeb = (bool) \App\Models\Pengaturan::get('wfh_enabled', '1');
-        $wfhDaysWeb = json_decode(\App\Models\Pengaturan::get('wfh_days', '["friday"]'), true) ?? ['friday'];
-        $selectedDayName = strtolower(\Carbon\Carbon::parse($tanggal)->format('l'));
-        $isHariWfhWeb = $wfhEnabledWeb && in_array($selectedDayName, $wfhDaysWeb);
-    @endphp
-
-    @if($isHariWfhWeb)
-        <div class="mb-5 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/[0.04]">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                </div>
-                <div>
-                    <h4 class="font-serif text-sm font-bold text-emerald-900 dark:text-emerald-300">Mode WFH (Work From Home) Aktif Hari Ini</h4>
-                    <p class="text-xs text-emerald-700 dark:text-emerald-400">Presensi pegawai pada hari {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }} dipandu oleh sistem radius koordinat domisili pegawai.</p>
-                </div>
-            </div>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300 shrink-0">
-                🏡 Presensi Domisili
-            </span>
-        </div>
-    @endif
-
-    {{-- Filter & Live Search Toolbar Container --}}
-    <div class="relative z-40 mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
-        <form method="GET" x-data="{ status: '{{ $filters['status'] ?? '' }}' }" class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-            {{-- Datepicker --}}
-            <div class="w-full sm:w-auto">
-                <input type="date" name="tanggal" value="{{ $tanggal }}" class="input text-xs w-full sm:w-40 shadow-[var(--shadow-card)]">
-            </div>
-
-            {{-- Unit Filter --}}
-            <div class="w-full sm:w-auto min-w-[170px]">
-                <x-select name="unit_id" :value="$filters['unit_id'] ?? ''" :options="$unitOptions" class="w-full" />
-            </div>
-
-            {{-- Status Filter --}}
-            <div class="w-full sm:w-auto min-w-[150px]" @change="status = $event.target.value">
-                <x-select name="status" :value="$filters['status'] ?? ''" :options="[
-                    ['value' => '', 'label' => 'Semua Status'],
-                    ['value' => 'hadir', 'label' => 'Hadir'],
-                    ['value' => 'telat', 'label' => 'Telat'],
-                    ['value' => 'izin', 'label' => 'Izin'],
-                    ['value' => 'sakit', 'label' => 'Sakit'],
-                    ['value' => 'alpa', 'label' => 'Alpa'],
-                    ['value' => 'belum_presensi', 'label' => 'Belum Presensi']
-                ]" class="w-full" />
-            </div>
-
-            {{-- Ketidakhadiran Filter --}}
-            <div x-show="status !== 'hadir' && status !== 'telat' && status !== 'belum_presensi' && status !== 'alpa'" x-cloak class="w-full sm:w-auto min-w-[190px]">
-                <x-select name="jenis_ketidakhadiran_id" :value="$filters['jenis_ketidakhadiran_id'] ?? ''" :options="$jkOptions" class="w-full" />
-            </div>
-
-            {{-- Amber Toggle Pill: Perlu Ditinjau --}}
-            <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-amber-300 bg-amber-50/80 px-3.5 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20 shadow-sm"
-                   title="Tampilkan hanya presensi yang memiliki indikasi lokasi perlu ditinjau">
-                <input type="checkbox" name="perlu_ditinjau" value="1"
-                       {{ !empty($filters['perlu_ditinjau']) ? 'checked' : '' }}
-                       class="h-3.5 w-3.5 rounded accent-amber-600">
-                <svg class="h-3.5 w-3.5 text-amber-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
-                Perlu Ditinjau
-            </label>
-
-            <button type="submit" class="btn-secondary text-xs">Filter</button>
-        </form>
-
-        @if(auth()->user()->role === 'admin')
-        <a href="{{ route('absensi.create') }}" class="btn-primary shrink-0 w-full lg:w-auto justify-center">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Catat Manual
-        </a>
         @endif
-    </div>
 
-    {{-- Tabel Absensi --}}
-    <div id="live-list-container" class="space-y-4" x-data="absensiDetailModal()">
+        {{-- Filter & Live Search Toolbar Container --}}
+        <div class="relative z-40 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
+            <form method="GET" x-data="{ status: '{{ $filters['status'] ?? '' }}' }" class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                {{-- Datepicker --}}
+                <div class="w-full sm:w-auto">
+                    <input type="date" name="tanggal" value="{{ $tanggal }}" @change="$el.form.submit()" onchange="this.form.submit()" class="input text-xs w-full sm:w-40 shadow-[var(--shadow-card)]">
+                </div>
+
+                {{-- Unit Filter --}}
+                <div class="w-full sm:w-auto min-w-[170px]">
+                    <x-select name="unit_id" :value="$filters['unit_id'] ?? ''" :options="$unitOptions" class="w-full" />
+                </div>
+
+                {{-- Status Filter --}}
+                <div class="w-full sm:w-auto min-w-[150px]" @change="status = $event.target.value">
+                    <x-select name="status" :value="$filters['status'] ?? ''" :options="[
+                        ['value' => '', 'label' => 'Semua Status'],
+                        ['value' => 'hadir', 'label' => 'Hadir'],
+                        ['value' => 'telat', 'label' => 'Telat'],
+                        ['value' => 'izin', 'label' => 'Izin'],
+                        ['value' => 'sakit', 'label' => 'Sakit'],
+                        ['value' => 'alpa', 'label' => 'Alpa'],
+                        ['value' => 'belum_presensi', 'label' => 'Belum Presensi']
+                    ]" class="w-full" />
+                </div>
+
+                {{-- Ketidakhadiran Filter --}}
+                <div x-show="status !== 'hadir' && status !== 'telat' && status !== 'belum_presensi' && status !== 'alpa'" x-cloak class="w-full sm:w-auto min-w-[190px]">
+                    <x-select name="jenis_ketidakhadiran_id" :value="$filters['jenis_ketidakhadiran_id'] ?? ''" :options="$jkOptions" class="w-full" />
+                </div>
+
+                {{-- Amber Toggle Pill: Perlu Ditinjau --}}
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-amber-300 bg-amber-50/80 px-3.5 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20 shadow-sm"
+                       title="Tampilkan hanya presensi yang memiliki indikasi lokasi perlu ditinjau">
+                    <input type="checkbox" name="perlu_ditinjau" value="1"
+                           {{ !empty($filters['perlu_ditinjau']) ? 'checked' : '' }}
+                           @change="$el.form.submit()" onchange="this.form.submit()"
+                           class="h-3.5 w-3.5 rounded accent-amber-600">
+                    <svg class="h-3.5 w-3.5 text-amber-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                    Perlu Ditinjau
+                </label>
+
+                <button type="submit" class="btn-secondary text-xs">Filter</button>
+            </form>
+
+            @if(auth()->user()->role === 'admin')
+            <a href="{{ route('absensi.create') }}" class="btn-primary shrink-0 w-full lg:w-auto justify-center">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Catat Manual
+            </a>
+            @endif
+        </div>
+
+        {{-- Tabel Absensi --}}
+        <div>
 
         <div class="table-shell">
             <table class="w-full text-left text-sm">
