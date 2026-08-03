@@ -62,8 +62,18 @@ class AbsensiController extends Controller
             ->pluck('pegawai_id')
             ->toArray();
 
-        // Pegawai yang belum presensi
-        $belumPresensiPegawais = $allPegawais->reject(fn ($p) => in_array($p->id, $recordedPegawaiIds));
+        $isWeekend = \Carbon\Carbon::parse($tanggal)->isWeekend();
+
+        // Pegawai yang belum presensi (jika akhir pekan, hanya sertakan pegawai yang punya jadwal shift)
+        $belumPresensiPegawais = $allPegawais->reject(function ($p) use ($recordedPegawaiIds, $isWeekend, $shiftsOnDay) {
+            if (in_array($p->id, $recordedPegawaiIds)) {
+                return true;
+            }
+            if ($isWeekend && !$shiftsOnDay->has($p->id)) {
+                return true;
+            }
+            return false;
+        });
 
         // Query absensi dari DB
         $query = Absensi::with(['pegawai.unit', 'jenisKetidakhadiran'])->whereDate('tanggal', $tanggal);
@@ -167,6 +177,7 @@ class AbsensiController extends Controller
             'isPastJamBatasAlpa'     => $isPastJamBatasAlpa,
             'jamBatasAlpa'           => $jamBatasAlpa,
             'shiftsOnDay'            => $shiftsOnDay,
+            'isWeekend'              => $isWeekend,
         ]);
     }
 
@@ -244,6 +255,12 @@ class AbsensiController extends Controller
     private function sudahMelampauiBatasAlpa(Pegawai $pegawai, string $tanggal, $shiftsOnDay): bool
     {
         $shift = $shiftsOnDay->get($pegawai->id);
+
+        // Pegawai non-shift pada akhir pekan tidak pernah melampaui batas alpa
+        if (\Carbon\Carbon::parse($tanggal)->isWeekend() && !$shift) {
+            return false;
+        }
+
         $p     = $this->statusService->getPengaturan();
 
         if ($shift) {

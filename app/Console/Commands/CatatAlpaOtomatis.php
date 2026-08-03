@@ -76,6 +76,11 @@ class CatatAlpaOtomatis extends Command
 
                 $shift = $shiftsOnDay->get($pegawai->id);
 
+                // Pegawai Non-Shift pada hari Sabtu/Minggu diskipped sepenuhnya dari Auto-Alpa
+                if ($tanggal->isWeekend() && !$shift) {
+                    continue;
+                }
+
                 // Cek apakah sudah harus di-alpa (waktu batas sudah lewat & tidak sedang cuti)
                 if (!$this->statusService->apakahHarusAlpa($pegawai, $tanggal, $shift)) {
                     continue;

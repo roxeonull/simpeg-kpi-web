@@ -108,6 +108,23 @@
             </div>
         @endif
 
+        @if($isWeekend)
+            <div class="flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50/80 p-4 dark:border-amber-500/20 dark:bg-amber-500/[0.04]">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-600 text-white shadow-sm">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-serif text-sm font-bold text-amber-900 dark:text-amber-300">Hari Ini Akhir Pekan ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l') }})</h4>
+                        <p class="text-xs text-amber-700 dark:text-amber-400">Presensi tidak diperlukan untuk pegawai non-shift pada akhir pekan. Hanya pegawai shift yang memiliki jadwal pada tanggal ini yang tercatat.</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3.5 py-1 text-xs font-bold text-amber-800 dark:bg-amber-500/20 dark:text-amber-300 shrink-0">
+                    🗓️ Akhir Pekan — Non-Shift Libur
+                </span>
+            </div>
+        @endif
+
         {{-- Filter & Live Search Toolbar Container --}}
         <div class="relative z-40 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between bg-white/40 p-4 rounded-2xl border border-kpi-line dark:border-white/10 dark:bg-kpi-dark-surface/40 backdrop-blur">
             <form method="GET" x-data="{ status: '{{ $filters['status'] ?? '' }}' }" class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">

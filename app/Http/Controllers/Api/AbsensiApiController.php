@@ -85,7 +85,16 @@ class AbsensiApiController extends Controller
             'accuracy'         => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
 
-        $existing = $pegawai->absensi()->whereDate('tanggal', now()->toDateString())->first();
+        $hariIni    = now()->toDateString();
+        $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
+
+        abort_if(
+            now()->isWeekend() && !$shiftToday,
+            422,
+            'Hari ini adalah hari libur (akhir pekan), presensi tidak diperlukan.'
+        );
+
+        $existing = $pegawai->absensi()->whereDate('tanggal', $hariIni)->first();
         abort_if($existing && $existing->jam_masuk, 422, 'Anda sudah presensi masuk hari ini.');
 
         $wfhEnabled = (bool) Pengaturan::get('wfh_enabled', '1');
@@ -111,12 +120,10 @@ class AbsensiApiController extends Controller
             abort_if($jarak > $radius, 422, "Anda berada di luar radius kantor ({$jarak} m dari kantor, maksimal {$radius} m).");
         }
 
-        $hariIni    = now()->toDateString();
-        $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
         $jamMasukStr = now()->format('H:i:s');
 
         // Validasi jendela waktu presensi masuk
-        $errorJendela = $this->statusService->validasiJendelaPresensiMasuk($jamMasukStr, $shiftToday);
+        $errorJendela = $this->statusService->validasiJendelaPresensiMasuk($jamMasukStr, $shiftToday, now());
         abort_if($errorJendela !== null, 422, $errorJendela);
 
         // Hitung status & jam pulang yang diizinkan menggunakan service
@@ -184,14 +191,21 @@ class AbsensiApiController extends Controller
             'accuracy'         => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
 
-        $absensi = $pegawai->absensi()->whereDate('tanggal', now()->toDateString())->first();
+        $hariIni    = now()->toDateString();
+        $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
+
+        abort_if(
+            now()->isWeekend() && !$shiftToday,
+            422,
+            'Hari ini adalah hari libur (akhir pekan), presensi tidak diperlukan.'
+        );
+
+        $absensi = $pegawai->absensi()->whereDate('tanggal', $hariIni)->first();
         abort_unless($absensi && $absensi->jam_masuk, 422, 'Anda belum presensi masuk hari ini.');
         abort_if($absensi->jam_keluar, 422, 'Anda sudah presensi keluar hari ini.');
 
         $jamKeluarStr       = now()->format('H:i:s');
         $jamPulangDiizinkan = $absensi->jam_pulang_diizinkan;
-        $hariIni            = now()->toDateString();
-        $shiftToday         = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
 
         // Hitung total menit pengurangan jam kerja (menit telat + menit pulang cepat)
         $hasilPengurangan = $this->statusService->hitungTotalMenitPengurangan(

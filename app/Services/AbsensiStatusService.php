@@ -46,10 +46,18 @@ class AbsensiStatusService
      *
      * @param  string           $jamMasukAktual  Format 'H:i' atau 'H:i:s'
      * @param  JadwalShift|null $jadwalShift     null = pegawai Normal
+     * @param  Carbon|null      $tanggal         null = hari ini (now())
      * @return string|null                      Null jika valid (terbuka), atau string pesan error jika belum terbuka
      */
-    public function validasiJendelaPresensiMasuk(string $jamMasukAktual, ?JadwalShift $jadwalShift): ?string
+    public function validasiJendelaPresensiMasuk(string $jamMasukAktual, ?JadwalShift $jadwalShift, ?Carbon $tanggal = null): ?string
     {
+        $dt = $tanggal ?? now();
+
+        // Pegawai Non-Shift pada hari Sabtu/Minggu tidak perlu presensi
+        if ($dt->isWeekend() && !$jadwalShift) {
+            return 'Hari ini adalah hari libur (akhir pekan), presensi tidak diperlukan.';
+        }
+
         $p = $this->getPengaturan();
         $aktual = $this->parseTime($jamMasukAktual);
 
@@ -76,6 +84,15 @@ class AbsensiStatusService
         }
 
         return null;
+    }
+
+    /**
+     * Cek apakah tanggal & pegawai tergolong libur akhir pekan (non-shift).
+     */
+    public function isHariLiburAkhirPekan(?JadwalShift $jadwalShift, ?Carbon $tanggal = null): bool
+    {
+        $dt = $tanggal ?? now();
+        return $dt->isWeekend() && !$jadwalShift;
     }
 
     /**
@@ -266,6 +283,11 @@ class AbsensiStatusService
      */
     public function apakahHarusAlpa(Pegawai $pegawai, Carbon $tanggal, ?JadwalShift $jadwalShift): bool
     {
+        // Pegawai Non-Shift pada hari Sabtu/Minggu tidak pernah dicatat Alpa
+        if ($tanggal->isWeekend() && !$jadwalShift) {
+            return false;
+        }
+
         $sekarang = now();
 
         // Tentukan jam batas alpa berdasarkan tipe pegawai
