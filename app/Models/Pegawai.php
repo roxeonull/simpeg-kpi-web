@@ -141,4 +141,42 @@ class Pegawai extends Model
         $diff = \Carbon\Carbon::parse($this->tmt_kepangkatan)->diff(now());
         return "{$diff->y} Tahun {$diff->m} Bulan";
     }
+
+    public function syncPendidikanTerakhir(): void
+    {
+        $latest = $this->riwayatPendidikan()->orderByDesc('tahun_lulus')->orderByDesc('id')->first();
+        $this->updateQuietly([
+            'pendidikan_terakhir' => $latest?->jenjang,
+            'jurusan_pendidikan' => $latest?->jurusan,
+            'universitas' => $latest?->institusi,
+        ]);
+    }
+
+    public function getPendidikanTerakhirAttribute($value)
+    {
+        if ($value !== null) {
+            return $value;
+        }
+        $latest = $this->riwayatPendidikan->sortByDesc('tahun_lulus')->first();
+        return $latest?->jenjang;
+    }
+
+    public function getJurusanPendidikanAttribute($value)
+    {
+        if ($value !== null) {
+            return $value;
+        }
+        $latest = $this->riwayatPendidikan->sortByDesc('tahun_lulus')->first();
+        return $latest?->jurusan;
+    }
+
+    public function getUniversitasAttribute($value)
+    {
+        if ($value !== null) {
+            return $value;
+        }
+        $latest = $this->riwayatPendidikan->sortByDesc('tahun_lulus')->first();
+        return $latest?->institusi;
+    }
 }
+

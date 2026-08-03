@@ -42,8 +42,7 @@
         // Deteksi Tab mana yang memiliki error validasi
         $personalFields = [
             'nama', 'nama_panggilan', 'gelar_depan', 'gelar_belakang', 'tempat_lahir', 'tanggal_lahir',
-            'jenis_kelamin', 'golongan_darah', 'agama', 'status_marital', 'pendidikan_terakhir',
-            'jurusan_pendidikan', 'universitas', 'email', 'email_pribadi', 'no_hp', 'telepon', 'fax',
+            'jenis_kelamin', 'golongan_darah', 'agama', 'status_marital', 'email', 'email_pribadi', 'no_hp', 'telepon', 'fax',
             'alamat', 'kelurahan', 'kecamatan', 'kota', 'provinsi', 'kode_pos'
         ];
 
@@ -81,13 +80,27 @@
         @csrf
         @if ($pegawai->exists) @method('PUT') @endif
 
+        <!-- Banner Petunjuk Field Wajib -->
+        <div class="flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-900 shadow-xs dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300">
+            <svg class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+            </svg>
+            <div>
+                Field dengan tanda bintang merah (<span class="font-bold text-rose-500">*</span>) <strong>wajib diisi</strong>:
+                <span class="font-medium">Nama Lengkap</span> (Tab Data Personal),
+                <span class="font-medium">NIP</span>,
+                <span class="font-medium">Status Kepegawaian</span>, dan
+                <span class="font-medium">Status Aktif</span> (Tab Data Kepegawaian).
+            </div>
+        </div>
+
         <!-- Tab Horizontal Navigation -->
         <div class="flex gap-1 overflow-x-auto border-b border-kpi-line px-1 dark:border-white/10">
             <button type="button" @click="activeTab = 'personal'" :class="activeTab === 'personal' ? 'border-kpi-red text-kpi-red font-semibold' : 'border-transparent text-kpi-gray hover:text-kpi-black dark:hover:text-stone-200'" class="whitespace-nowrap border-b-2 px-6 py-3 text-sm font-medium transition-colors">
-                Data Personal
+                Data Personal <span class="text-rose-500 font-bold">*</span>
             </button>
             <button type="button" @click="activeTab = 'kepegawaian'" :class="activeTab === 'kepegawaian' ? 'border-kpi-red text-kpi-red font-semibold' : 'border-transparent text-kpi-gray hover:text-kpi-black dark:hover:text-stone-200'" class="whitespace-nowrap border-b-2 px-6 py-3 text-sm font-medium transition-colors">
-                Data Kepegawaian
+                Data Kepegawaian <span class="text-rose-500 font-bold">*</span>
             </button>
             <button type="button" @click="activeTab = 'lain_lain'" :class="activeTab === 'lain_lain' ? 'border-kpi-red text-kpi-red font-semibold' : 'border-transparent text-kpi-gray hover:text-kpi-black dark:hover:text-stone-200'" class="whitespace-nowrap border-b-2 px-6 py-3 text-sm font-medium transition-colors">
                 Data Lain-Lain
@@ -107,7 +120,7 @@
                         <input type="text" name="gelar_depan" value="{{ old('gelar_depan', $pegawai->gelar_depan) }}" placeholder="Contoh: Dr., Ir." class="input">
                     </div>
                     <div>
-                        <label class="label">Nama Lengkap</label>
+                        <label class="label">Nama Lengkap <span class="text-rose-500 font-bold">*</span></label>
                         <input type="text" name="nama" value="{{ old('nama', $pegawai->nama) }}" required placeholder="Nama lengkap sesuai KTP" class="input">
                     </div>
                     <div>
@@ -204,27 +217,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Pendidikan Terakhir -->
-            <div class="card">
-                <p class="eyebrow">Riwayat Pendidikan Ringkas</p>
-                <h2 class="mt-1 mb-5 font-serif text-lg font-semibold">Pendidikan Terakhir Utama</h2>
-
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label class="label">Pendidikan Terakhir (Jenjang)</label>
-                        <input type="text" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $pegawai->pendidikan_terakhir) }}" placeholder="Contoh: S1 / S2 / D3" class="input">
-                    </div>
-                    <div>
-                        <label class="label">Jurusan Pendidikan</label>
-                        <input type="text" name="jurusan_pendidikan" value="{{ old('jurusan_pendidikan', $pegawai->jurusan_pendidikan) }}" placeholder="Contoh: Teknik Informatika" class="input">
-                    </div>
-                    <div>
-                        <label class="label">Nama Universitas/Lembaga</label>
-                        <input type="text" name="universitas" value="{{ old('universitas', $pegawai->universitas) }}" placeholder="Contoh: Universitas Indonesia" class="input">
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- ==================== TAB 2: DATA KEPEGAWAIAN ==================== -->
@@ -236,7 +228,7 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="label">NIP (Nomor Induk Pegawai)</label>
+                        <label class="label">NIP (Nomor Induk Pegawai) <span class="text-rose-500 font-bold">*</span></label>
                         <input type="text" name="nip" value="{{ old('nip', $pegawai->nip) }}" required class="input mono">
                     </div>
                     <div>
@@ -244,7 +236,7 @@
                         <x-select name="tipe_pegawai" :value="old('tipe_pegawai', $pegawai->tipe_pegawai) ?? ''" :options="$tipeOptions" class="w-full" />
                     </div>
                     <div>
-                        <label class="label">Status Kepegawaian</label>
+                        <label class="label">Status Kepegawaian <span class="text-rose-500 font-bold">*</span></label>
                         <x-select name="status_kepegawaian" :value="old('status_kepegawaian', $pegawai->status_kepegawaian) ?? ''" :options="[
                             ['value' => 'PNS', 'label' => 'PNS'],
                             ['value' => 'PPPK', 'label' => 'PPPK'],
@@ -252,7 +244,7 @@
                         ]" class="w-full" />
                     </div>
                     <div>
-                        <label class="label">Status Aktif</label>
+                        <label class="label">Status Aktif <span class="text-rose-500 font-bold">*</span></label>
                         <x-select name="status_aktif" :value="old('status_aktif', $pegawai->status_aktif ?: 'aktif') ?? ''" :options="[
                             ['value' => 'aktif', 'label' => 'Aktif'],
                             ['value' => 'nonaktif', 'label' => 'Nonaktif']

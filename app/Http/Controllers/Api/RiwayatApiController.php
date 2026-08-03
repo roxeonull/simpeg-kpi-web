@@ -24,7 +24,7 @@ class RiwayatApiController extends Controller
             'jenjang' => $r->jenjang,
             'institusi' => $r->institusi,
             'jurusan' => $r->jurusan,
-            'tahun_lulus' => $r->tahun_lulus,
+            'tahun_lulus' => (int) $r->tahun_lulus,
             'file_ijazah' => $r->file_ijazah ? asset('storage/' . $r->file_ijazah) : null,
         ]);
 

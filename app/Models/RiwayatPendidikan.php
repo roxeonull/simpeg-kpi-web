@@ -18,4 +18,16 @@ class RiwayatPendidikan extends Model
     {
         return $this->belongsTo(Pegawai::class);
     }
+
+    protected static function booted(): void
+    {
+        static::saved(function (RiwayatPendidikan $riwayat) {
+            $riwayat->pegawai?->syncPendidikanTerakhir();
+        });
+
+        static::deleted(function (RiwayatPendidikan $riwayat) {
+            $riwayat->pegawai?->syncPendidikanTerakhir();
+        });
+    }
 }
+
