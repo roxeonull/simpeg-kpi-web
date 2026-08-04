@@ -610,7 +610,7 @@
                             {{ $formattedTotal }}
                         </span>
                         <span class="text-xs text-kpi-gray">
-                            ({{ \Carbon\Carbon::createFromFormat('Y-m', request('bulan_absensi', now()->format('Y-m')))->translatedFormat('F Y') }})
+                            ({{ \Carbon\Carbon::parse(request('bulan_absensi', now()->format('Y-m')) . '-01')->translatedFormat('F Y') }})
                         </span>
                     </div>
                 </div>
@@ -622,9 +622,7 @@
                     <input type="hidden" name="tab" value="absensi">
                     
                     <label class="text-xs text-kpi-gray font-semibold">Filter Bulan:</label>
-                    <input type="month" name="bulan_absensi" value="{{ request('bulan_absensi', now()->format('Y-m')) }}" class="input max-w-[170px] !py-1.5 !text-xs">
-                    <button type="submit" class="btn-primary !py-1.5 !px-3 !text-xs">Filter</button>
-                    <a href="{{ url()->current() }}?tab=absensi" class="btn-secondary !py-1.5 !px-3 !text-xs">Reset</a>
+                    <input type="month" name="bulan_absensi" value="{{ request('bulan_absensi', now()->format('Y-m')) }}" onchange="this.form.submit()" class="input max-w-[170px] !py-1.5 !text-xs cursor-pointer">
                 </form>
             </div>
 
@@ -697,9 +695,7 @@
                 <input type="hidden" name="tab" value="shift">
                 
                 <label class="text-xs text-kpi-gray block font-semibold">Filter Bulan:</label>
-                <input type="month" name="bulan_shift" value="{{ request('bulan_shift', now()->format('Y-m')) }}" class="input max-w-[180px]">
-                <button type="submit" class="btn-primary">Filter</button>
-                <a href="{{ url()->current() }}?tab=shift" class="btn-secondary">Reset</a>
+                <input type="month" name="bulan_shift" value="{{ request('bulan_shift', now()->format('Y-m')) }}" onchange="this.form.submit()" class="input max-w-[180px] cursor-pointer">
             </form>
 
             <div class="space-y-2">

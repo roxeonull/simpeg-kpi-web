@@ -198,30 +198,31 @@ class CutiApiController extends Controller
             'status_hr' => $c->status_hr,
             'catatan_hr' => $c->catatan_hr,
             'status_label' => $c->statusLabel(),
+            'can_approve' => request()->user() ? $c->canUserApproveActiveStep(request()->user()) : false,
             'created_at' => $c->created_at->toIso8601String(),
         ];
 
         if ($detail) {
-            $base['timeline'] = [
+            $c->loadMissing(['approvalSteps.pemrosesUser']);
+            $timeline = [
                 [
                     'tahap' => 'Diajukan',
                     'status' => 'selesai',
                     'waktu' => $c->created_at->toIso8601String(),
                     'catatan' => null,
                 ],
-                [
-                    'tahap' => 'Persetujuan Atasan',
-                    'status' => $c->status_atasan,
-                    'waktu' => $c->atasan_diproses_pada?->toIso8601String(),
-                    'catatan' => $c->catatan_atasan,
-                ],
-                [
-                    'tahap' => 'Persetujuan HR',
-                    'status' => $c->status_hr,
-                    'waktu' => $c->hr_diproses_pada?->toIso8601String(),
-                    'catatan' => $c->catatan_hr,
-                ],
             ];
+
+            foreach ($c->approvalSteps as $step) {
+                $timeline[] = [
+                    'tahap' => 'Persetujuan ' . $step->tipeStepLabel(),
+                    'status' => $step->status,
+                    'waktu' => $step->diproses_pada?->toIso8601String(),
+                    'catatan' => $step->catatan,
+                ];
+            }
+
+            $base['timeline'] = $timeline;
         }
 
         return $base;

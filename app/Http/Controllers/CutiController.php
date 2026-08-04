@@ -73,53 +73,57 @@ class CutiController extends Controller
 
     public function show(Cuti $cuti)
     {
-        $cuti->load(['pegawai.unit', 'atasanPemroses', 'hrPemroses']);
+        $cuti->load(['pegawai.unit', 'atasanPemroses', 'hrPemroses', 'approvalSteps.pemrosesUser']);
 
         return view('cuti.show', ['cuti' => $cuti]);
     }
 
-    public function approveAtasan(Request $request, Cuti $cuti)
+    public function approveStep(Request $request, Cuti $cuti)
     {
-        $this->authorizeAtasan($request, $cuti);
+        abort_unless($cuti->canUserApproveActiveStep($request->user()), 403, 'Anda tidak berhak memproses persetujuan tahap ini.');
 
         $data = $request->validate(['catatan' => ['nullable', 'string']]);
-        $cuti->setujuiAtasan($request->user(), $data['catatan'] ?? null);
+        $activeStep = $cuti->activeStep();
+        $cuti->prosesActiveStep($request->user(), 'disetujui', $data['catatan'] ?? null);
 
-        AuditLog::catat('menyetujui cuti (atasan)', 'Cuti', $cuti->id, $cuti->pegawai->nama);
+        $tahapLabel = $activeStep ? $activeStep->tipeStepLabel() : 'tahap ini';
+        AuditLog::catat("menyetujui cuti ({$tahapLabel})", 'Cuti', $cuti->id, $cuti->pegawai->nama);
 
-        return back()->with('status', 'Pengajuan cuti disetujui pada tahap atasan.');
+        return back()->with('status', "Pengajuan cuti berhasil disetujui pada tahap {$tahapLabel}.");
+    }
+
+    public function rejectStep(Request $request, Cuti $cuti)
+    {
+        abort_unless($cuti->canUserApproveActiveStep($request->user()), 403, 'Anda tidak berhak memproses persetujuan tahap ini.');
+
+        $data = $request->validate(['catatan' => ['required', 'string']]);
+        $activeStep = $cuti->activeStep();
+        $cuti->prosesActiveStep($request->user(), 'ditolak', $data['catatan']);
+
+        $tahapLabel = $activeStep ? $activeStep->tipeStepLabel() : 'tahap ini';
+        AuditLog::catat("menolak cuti ({$tahapLabel})", 'Cuti', $cuti->id, $cuti->pegawai->nama);
+
+        return back()->with('status', "Pengajuan cuti ditolak pada tahap {$tahapLabel}.");
+    }
+
+    public function approveAtasan(Request $request, Cuti $cuti)
+    {
+        return $this->approveStep($request, $cuti);
     }
 
     public function rejectAtasan(Request $request, Cuti $cuti)
     {
-        $this->authorizeAtasan($request, $cuti);
-
-        $data = $request->validate(['catatan' => ['required', 'string']]);
-        $cuti->tolakAtasan($request->user(), $data['catatan']);
-
-        AuditLog::catat('menolak cuti (atasan)', 'Cuti', $cuti->id, $cuti->pegawai->nama);
-
-        return back()->with('status', 'Pengajuan cuti ditolak pada tahap atasan.');
+        return $this->rejectStep($request, $cuti);
     }
 
     public function approveHr(Request $request, Cuti $cuti)
     {
-        $data = $request->validate(['catatan' => ['nullable', 'string']]);
-        $cuti->setujuiHr($request->user(), $data['catatan'] ?? null);
-
-        AuditLog::catat('menyetujui cuti (HR)', 'Cuti', $cuti->id, $cuti->pegawai->nama);
-
-        return back()->with('status', 'Pengajuan cuti disetujui final oleh HR.');
+        return $this->approveStep($request, $cuti);
     }
 
     public function rejectHr(Request $request, Cuti $cuti)
     {
-        $data = $request->validate(['catatan' => ['required', 'string']]);
-        $cuti->tolakHr($request->user(), $data['catatan']);
-
-        AuditLog::catat('menolak cuti (HR)', 'Cuti', $cuti->id, $cuti->pegawai->nama);
-
-        return back()->with('status', 'Pengajuan cuti ditolak oleh HR.');
+        return $this->rejectStep($request, $cuti);
     }
 
     public function create(Request $request)

@@ -26,10 +26,13 @@ class CutiFeatureTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/cuti/rekomendasi');
         $response->assertStatus(200);
+
+        $response = $this->actingAs($admin)->get('/cuti/workflows');
+        $response->assertStatus(200);
     }
 
     /**
-     * Memastikan Atasan dapat mengakses semua sub-halaman Cuti & Izin.
+     * Memastikan Atasan dapat mengakses semua sub-halaman Cuti & Izin kecuali Workflows.
      */
     public function test_atasan_can_access_cuti_pages(): void
     {
@@ -47,5 +50,8 @@ class CutiFeatureTest extends TestCase
 
         $response = $this->actingAs($atasan)->get('/cuti/rekomendasi');
         $response->assertStatus(200);
+
+        $response = $this->actingAs($atasan)->get('/cuti/workflows');
+        $response->assertStatus(403);
     }
 }

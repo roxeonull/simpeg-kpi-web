@@ -46,7 +46,7 @@ class AtasanApiController extends Controller
     {
         $this->authorizeAtasan($request, $cuti);
 
-        abort_if($cuti->status_atasan !== 'menunggu', 422, 'Pengajuan cuti ini sudah diproses.');
+        abort_unless($cuti->canUserApproveActiveStep($request->user()), 422, 'Pengajuan cuti ini tidak sedang menunggu persetujuan Anda.');
 
         $data = $request->validate([
             'catatan' => ['nullable', 'string', 'max:500'],
@@ -67,7 +67,7 @@ class AtasanApiController extends Controller
     {
         $this->authorizeAtasan($request, $cuti);
 
-        abort_if($cuti->status_atasan !== 'menunggu', 422, 'Pengajuan cuti ini sudah diproses.');
+        abort_unless($cuti->canUserApproveActiveStep($request->user()), 422, 'Pengajuan cuti ini tidak sedang menunggu persetujuan Anda.');
 
         $data = $request->validate([
             'catatan' => ['required', 'string', 'max:500'],
@@ -120,6 +120,7 @@ class AtasanApiController extends Controller
             'status_hr' => $c->status_hr,
             'catatan_hr' => $c->catatan_hr,
             'status_label' => $c->statusLabel(),
+            'can_approve' => request()->user() ? $c->canUserApproveActiveStep(request()->user()) : false,
             'created_at' => $c->created_at->toIso8601String(),
         ];
     }

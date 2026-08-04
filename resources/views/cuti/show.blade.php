@@ -46,79 +46,74 @@
         <div class="card">
             <h3 class="mb-5 font-serif text-base font-semibold">Alur Persetujuan</h3>
 
+            @php
+                $activeStep = $cuti->activeStep();
+                $canApprove = $cuti->canUserApproveActiveStep(auth()->user());
+            @endphp
+
             <div class="space-y-6">
-                {{-- Stage 1 --}}
-                <div class="flex gap-4">
-                    <div class="flex flex-col items-center">
-                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold
-                            {{ $cuti->status_atasan === 'disetujui' ? 'bg-emerald-500 text-white' : ($cuti->status_atasan === 'ditolak' ? 'bg-rose-500 text-white' : 'bg-kpi-gold-soft text-kpi-gold') }}">
-                            @if($cuti->status_atasan === 'disetujui')
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            @else
-                                1
+                @foreach ($cuti->approvalSteps as $step)
+                    @php
+                        $isCurrentActive = $activeStep && $activeStep->id === $step->id;
+                        $circleBg = match($step->status) {
+                            'disetujui' => 'bg-emerald-500 text-white',
+                            'ditolak' => 'bg-rose-500 text-white',
+                            default => ($isCurrentActive ? 'bg-kpi-gold text-white shadow-md' : 'bg-stone-100 text-kpi-gray dark:bg-white/10'),
+                        };
+                    @endphp
+                    <div class="flex gap-4">
+                        <div class="flex flex-col items-center">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $circleBg }}">
+                                @if($step->status === 'disetujui')
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                @elseif($step->status === 'ditolak')
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                                @else
+                                    {{ $step->urutan }}
+                                @endif
+                            </div>
+                            @if (!$loop->last)
+                                <div class="mt-1 h-full w-px flex-1 bg-kpi-line dark:bg-white/10"></div>
                             @endif
                         </div>
-                        <div class="mt-1 h-full w-px flex-1 bg-kpi-line dark:bg-white/10"></div>
-                    </div>
-                    <div class="flex-1 pb-2">
-                        <p class="text-sm font-semibold">Persetujuan Atasan</p>
-                        <p class="mb-3 mt-0.5"><x-badge :color="$cuti->status_atasan === 'disetujui' ? 'success' : ($cuti->status_atasan === 'ditolak' ? 'danger' : 'warning')">{{ ucfirst($cuti->status_atasan) }}</x-badge></p>
-                        @if ($cuti->catatan_atasan)
-                            <p class="mb-3 rounded-lg bg-kpi-cream px-3 py-2 text-sm text-kpi-gray dark:bg-white/5">{{ $cuti->catatan_atasan }}</p>
-                        @endif
-
-                        @if ($cuti->status_atasan === 'menunggu' && in_array(auth()->user()->role, ['atasan']))
-                            <div class="flex flex-wrap gap-3">
-                                <form method="POST" action="{{ route('cuti.approve-atasan', $cuti) }}">
-                                    @csrf @method('PATCH')
-                                    <button class="btn-primary">Setujui</button>
-                                </form>
-                                <form method="POST" action="{{ route('cuti.reject-atasan', $cuti) }}" x-data
-                                      @submit.prevent="let c = prompt('Alasan penolakan:'); if(c){ $el.querySelector('[name=catatan]').value = c; $el.submit(); }">
-                                    @csrf @method('PATCH')
-                                    <input type="hidden" name="catatan">
-                                    <button type="submit" class="btn-danger">Tolak</button>
-                                </form>
+                        <div class="flex-1 pb-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <p class="text-sm font-semibold">Step {{ $step->urutan }}: Persetujuan {{ $step->tipeStepLabel() }}</p>
+                                <x-badge :color="$step->status === 'disetujui' ? 'success' : ($step->status === 'ditolak' ? 'danger' : 'warning')">{{ ucfirst($step->status) }}</x-badge>
                             </div>
-                        @endif
-                    </div>
-                </div>
+                            
+                            @if ($step->pemrosesUser)
+                                <p class="mt-0.5 text-xs text-kpi-gray">
+                                    Diproses oleh <strong class="text-stone-700 dark:text-stone-300">{{ $step->pemrosesUser->name }}</strong>
+                                    @if ($step->diproses_pada)
+                                        pada {{ $step->diproses_pada->format('d M Y H:i') }}
+                                    @endif
+                                </p>
+                            @endif
 
-                {{-- Stage 2 --}}
-                <div class="flex gap-4">
-                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold
-                        {{ $cuti->status_hr === 'disetujui' ? 'bg-emerald-500 text-white' : ($cuti->status_hr === 'ditolak' ? 'bg-rose-500 text-white' : 'bg-stone-100 text-kpi-gray dark:bg-white/10') }}">
-                        @if($cuti->status_hr === 'disetujui')
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                        @else
-                            2
-                        @endif
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold">Persetujuan HR / Admin</p>
-                        <p class="mb-3 mt-0.5"><x-badge :color="$cuti->status_hr === 'disetujui' ? 'success' : ($cuti->status_hr === 'ditolak' ? 'danger' : 'warning')">{{ ucfirst($cuti->status_hr) }}</x-badge></p>
-                        @if ($cuti->catatan_hr)
-                            <p class="mb-3 rounded-lg bg-kpi-cream px-3 py-2 text-sm text-kpi-gray dark:bg-white/5">{{ $cuti->catatan_hr }}</p>
-                        @endif
+                            @if ($step->catatan)
+                                <p class="mt-2 rounded-lg bg-kpi-cream px-3 py-2 text-sm text-kpi-gray dark:bg-white/5">{{ $step->catatan }}</p>
+                            @endif
 
-                        @if ($cuti->status === 'menunggu_hr' && auth()->user()->role === 'admin')
-                            <div class="flex flex-wrap gap-3">
-                                <form method="POST" action="{{ route('cuti.approve-hr', $cuti) }}">
-                                    @csrf @method('PATCH')
-                                    <button class="btn-primary">Setujui Final</button>
-                                </form>
-                                <form method="POST" action="{{ route('cuti.reject-hr', $cuti) }}" x-data
-                                      @submit.prevent="let c = prompt('Alasan penolakan:'); if(c){ $el.querySelector('[name=catatan]').value = c; $el.submit(); }">
-                                    @csrf @method('PATCH')
-                                    <input type="hidden" name="catatan">
-                                    <button type="submit" class="btn-danger">Tolak</button>
-                                </form>
-                            </div>
-                        @elseif ($cuti->status_atasan === 'menunggu')
-                            <p class="text-sm text-kpi-gray">Menunggu persetujuan atasan terlebih dahulu.</p>
-                        @endif
+                            @if ($isCurrentActive && $canApprove)
+                                <div class="mt-3 flex flex-wrap gap-3">
+                                    <form method="POST" action="{{ route('cuti.approve-step', $cuti) }}">
+                                        @csrf @method('PATCH')
+                                        <button class="btn-primary">Setujui Tahap Ini</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('cuti.reject-step', $cuti) }}" x-data
+                                          @submit.prevent="let c = prompt('Alasan penolakan:'); if(c){ $el.querySelector('[name=catatan]').value = c; $el.submit(); }">
+                                        @csrf @method('PATCH')
+                                        <input type="hidden" name="catatan">
+                                        <button type="submit" class="btn-danger">Tolak Tahap Ini</button>
+                                    </form>
+                                </div>
+                            @elseif ($step->status === 'menunggu' && !$isCurrentActive)
+                                <p class="mt-1 text-xs text-kpi-gray">Menunggu persetujuan tahap sebelumnya.</p>
+                            @endif
+                        </div>
                     </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>

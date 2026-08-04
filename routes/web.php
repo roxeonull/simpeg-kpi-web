@@ -13,6 +13,7 @@ use App\Http\Controllers\RiwayatPelatihanController;
 use App\Http\Controllers\RiwayatPendidikanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\JadwalShiftController;
+use App\Http\Controllers\CutiWorkflowController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -47,6 +48,11 @@ Route::middleware('auth')->group(function () {
 
         Route::patch('/cuti/{cuti}/setujui-hr', [CutiController::class, 'approveHr'])->name('cuti.approve-hr');
         Route::patch('/cuti/{cuti}/tolak-hr', [CutiController::class, 'rejectHr'])->name('cuti.reject-hr');
+
+        Route::get('/cuti/workflows', [CutiWorkflowController::class, 'index'])->name('cuti.workflows');
+        Route::post('/cuti/workflows', [CutiWorkflowController::class, 'store'])->name('cuti.workflows.store');
+        Route::put('/cuti/workflows/{workflow}', [CutiWorkflowController::class, 'update'])->name('cuti.workflows.update');
+        Route::delete('/cuti/workflows/{workflow}', [CutiWorkflowController::class, 'destroy'])->name('cuti.workflows.destroy');
 
         Route::get('/pengajuan-perubahan', [PengajuanPerubahanDataController::class, 'index'])->name('pengajuan-perubahan.index');
         Route::patch('/pengajuan-perubahan/{pengajuan}/setujui', [PengajuanPerubahanDataController::class, 'setujui'])->name('pengajuan-perubahan.setujui');
@@ -118,5 +124,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/cuti/{cuti}', [CutiController::class, 'show'])->name('cuti.show');
         Route::patch('/cuti/{cuti}/setujui-atasan', [CutiController::class, 'approveAtasan'])->name('cuti.approve-atasan');
         Route::patch('/cuti/{cuti}/tolak-atasan', [CutiController::class, 'rejectAtasan'])->name('cuti.reject-atasan');
+        Route::patch('/cuti/{cuti}/setujui-step', [CutiController::class, 'approveStep'])->name('cuti.approve-step');
+        Route::patch('/cuti/{cuti}/tolak-step', [CutiController::class, 'rejectStep'])->name('cuti.reject-step');
     });
 });
