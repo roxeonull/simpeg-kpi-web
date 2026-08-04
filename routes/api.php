@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 // ── Auth (tanpa middleware) ──────────────────────────────────────────────────
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/lupa-password', [AuthController::class, 'lupaPassword']);
+Route::post('/forgot-password/request-otp', [AuthController::class, 'requestOtp']);
+Route::post('/forgot-password/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/forgot-password/reset-password', [AuthController::class, 'resetPasswordWithOtp']);
 
 // ── Endpoint yang butuh token Sanctum ───────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
