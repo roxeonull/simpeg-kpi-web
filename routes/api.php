@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CutiApiController;
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\ProfileApiController;
 use App\Http\Controllers\Api\RiwayatApiController;
+use App\Http\Controllers\Api\DinasLuarApiController;
 use App\Http\Controllers\Api\FcmTokenController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/atasan/cuti-tim',           [AtasanApiController::class, 'cutiTim']);
     Route::patch('/atasan/cuti/{cuti}/setujui', [AtasanApiController::class, 'setujuiCuti']);
     Route::patch('/atasan/cuti/{cuti}/tolak',   [AtasanApiController::class, 'tolakCuti']);
+
+    // Dinas Luar / WFA
+    Route::get('/jenis-ketidakhadiran',          [DinasLuarApiController::class, 'options']);
+    Route::get('/dinas-luar',                    [DinasLuarApiController::class, 'index']);
+    Route::post('/dinas-luar',                   [DinasLuarApiController::class, 'store']);
+    Route::get('/atasan/dinas-luar-tim',         [DinasLuarApiController::class, 'teamRequests']);
+    Route::patch('/atasan/dinas-luar/{id}/setujui', [DinasLuarApiController::class, 'setujui']);
+    Route::patch('/atasan/dinas-luar/{id}/tolak',   [DinasLuarApiController::class, 'tolak']);
 
     // Riwayat
     Route::get('/riwayat/pendidikan',        [RiwayatApiController::class, 'pendidikan']);

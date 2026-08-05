@@ -26,6 +26,10 @@
            class="whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors border-kpi-red text-kpi-red font-semibold">
             Jadwal Shift
         </a>
+        <a href="{{ route('dinas-luar.index') }}"
+           class="whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition-colors border-transparent text-kpi-gray hover:text-kpi-black dark:hover:text-stone-200">
+            Dinas Luar & WFA
+        </a>
     </div>
 
     {{-- Sub-tab Pills Navigation --}}

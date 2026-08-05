@@ -59,6 +59,14 @@ class AbsensiApiController extends Controller
                 ?? $this->statusService->hitungJamPulangDiizinkan($absensi->jam_masuk, $shiftToday);
         }
 
+        $todayStr = now()->toDateString();
+        $dinasLuarAktif = \App\Models\DinasLuar::with('jenisKetidakhadiran')
+            ->where('pegawai_id', $pegawai->id)
+            ->where('status', 'disetujui')
+            ->whereDate('tanggal_mulai', '<=', $todayStr)
+            ->whereDate('tanggal_selesai', '>=', $todayStr)
+            ->first();
+
         return response()->json([
             'data'                   => $absensi ? $this->format($absensi) : null,
             'jam_masuk_kantor'       => $jamMasukKantor,
@@ -68,6 +76,9 @@ class AbsensiApiController extends Controller
             'office_lat'             => (float) Pengaturan::get('kantor_lat', -6.167034493339591),
             'office_lng'             => (float) Pengaturan::get('kantor_lng', 106.82246468208389),
             'office_radius_meters'   => (float) Pengaturan::get('radius_gps', 100),
+            'is_dinas_luar_aktif'    => $dinasLuarAktif !== null,
+            'bypass_geofence'        => $dinasLuarAktif !== null,
+            'dinas_luar_nama'        => $dinasLuarAktif?->jenisKetidakhadiran?->nama ?? 'Dinas Luar / Tugas Khusus',
         ]);
     }
 

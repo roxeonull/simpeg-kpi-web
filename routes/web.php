@@ -14,6 +14,7 @@ use App\Http\Controllers\RiwayatPendidikanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\JadwalShiftController;
 use App\Http\Controllers\CutiWorkflowController;
+use App\Http\Controllers\DinasLuarWebController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -124,7 +125,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/cuti/{cuti}', [CutiController::class, 'show'])->name('cuti.show');
         Route::patch('/cuti/{cuti}/setujui-atasan', [CutiController::class, 'approveAtasan'])->name('cuti.approve-atasan');
         Route::patch('/cuti/{cuti}/tolak-atasan', [CutiController::class, 'rejectAtasan'])->name('cuti.reject-atasan');
-        Route::patch('/cuti/{cuti}/setujui-step', [CutiController::class, 'approveStep'])->name('cuti.approve-step');
+        Route::get('/cuti/{cuti}/setujui-step', [CutiController::class, 'approveStep'])->name('cuti.approve-step');
         Route::patch('/cuti/{cuti}/tolak-step', [CutiController::class, 'rejectStep'])->name('cuti.reject-step');
+
+        Route::get('/dinas-luar', [DinasLuarWebController::class, 'index'])->name('dinas-luar.index');
+        Route::patch('/dinas-luar/{id}/setujui', [DinasLuarWebController::class, 'setujui'])->name('dinas-luar.setujui');
+        Route::patch('/dinas-luar/{id}/tolak', [DinasLuarWebController::class, 'tolak'])->name('dinas-luar.tolak');
     });
 });
