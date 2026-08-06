@@ -19,6 +19,15 @@
             const f = this.options.find(o => o.value == v);
             this.label = f ? f.label : '{{ $placeholder }}';
         });
+
+        this.$watch('open', v => {
+            const cardEl = this.$el.closest('.card, .panel');
+            if (cardEl) {
+                cardEl.style.zIndex = v ? '100' : '';
+                cardEl.style.position = 'relative';
+            }
+            this.$el.style.zIndex = v ? '100' : '';
+        });
     },
     select(opt) {
         this.value = opt.value;
@@ -31,7 +40,7 @@
             selectEl.dispatchEvent(new Event('change', { bubbles: true }));
         });
     }
-}" :class="{ 'z-50': open }" class="relative inline-block text-left {{ $class }}" @click.outside="open = false">
+}" :class="{ 'z-[100] relative': open }" class="relative inline-block text-left {{ $class }}" @click.outside="open = false">
     
     <!-- Hidden native select to keep compatibility with standard PHP forms & JS handlers -->
     <select name="{{ $name }}" x-ref="hiddenSelect" class="hidden">
@@ -42,14 +51,14 @@
 
     <!-- Trigger Button -->
     <button type="button" @click="open = !open" 
-            class="flex w-full items-center justify-between gap-2.5 rounded-xl border border-stone-200 bg-white/90 px-3.5 py-2.5 text-sm font-medium text-kpi-black shadow-[var(--shadow-card)] backdrop-blur-md transition-all duration-200 hover:border-stone-300 hover:bg-stone-50/50 focus:border-kpi-red focus:outline-none focus:ring-2 focus:ring-kpi-red/15 dark:border-white/5 dark:bg-kpi-dark-surface/90 dark:text-stone-100 dark:hover:border-white/10 dark:hover:bg-white/[0.02]">
+            class="flex w-full items-center justify-between gap-2.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm font-medium text-kpi-black shadow-[var(--shadow-card)] transition-all duration-200 hover:border-stone-300 hover:bg-stone-50/50 focus:border-kpi-red focus:outline-none focus:ring-2 focus:ring-kpi-red/15 dark:border-white/10 dark:bg-kpi-dark-surface dark:text-stone-100 dark:hover:border-white/20">
         <span x-text="label" class="truncate"></span>
         <svg class="h-4 w-4 shrink-0 text-kpi-gray transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
         </svg>
     </button>
 
-    <!-- Floating Options Dropdown Menu -->
+    <!-- Floating Options Dropdown Menu (Solid 100% Opaque White Background) -->
     <div x-show="open" 
          x-transition:enter="transition ease-out duration-100"
          x-transition:enter-start="transform opacity-0 scale-95"
@@ -57,7 +66,7 @@
          x-transition:leave="transition ease-in duration-75"
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
-         class="absolute left-0 z-50 mt-1.5 max-h-60 w-full min-w-full overflow-y-auto rounded-2xl border border-kpi-line bg-white/95 py-1.5 shadow-[var(--shadow-card-hover)] backdrop-blur-lg dark:border-white/10 dark:bg-kpi-dark-surface/95"
+         class="absolute left-0 z-[100] mt-1.5 max-h-60 w-full min-w-full overflow-y-auto rounded-2xl border border-stone-200 bg-white py-1.5 shadow-2xl dark:border-white/15 dark:bg-[#25211B]"
          x-cloak>
         <div class="px-1 space-y-0.5">
             <template x-for="opt in options" :key="opt.value">

@@ -65,8 +65,8 @@ class DinasLuarWebController extends Controller
 
         $dinasLuar->syncToAbsensi();
 
-        AuditLog::catat('setujui', 'DinasLuar', $dinasLuar->id, "Menyetujui Dinas Luar ID #{$dinasLuar->id} pegawai {$dinasLuar->pegawai?->nama}");
-
+        $namaPegawai = $dinasLuar->pegawai->nama ?? '-';
+        AuditLog::catat('setujui', 'DinasLuar', $dinasLuar->id, "Menyetujui Dinas Luar ID #{$dinasLuar->id} pegawai {$namaPegawai}");
         // Send FCM Notification to Pegawai
         if ($dinasLuar->pegawai && $dinasLuar->pegawai->user) {
             $tglStr = \Carbon\Carbon::parse($dinasLuar->tanggal_mulai)->format('d M') . ' s.d. ' . \Carbon\Carbon::parse($dinasLuar->tanggal_selesai)->format('d M Y');
@@ -92,7 +92,8 @@ class DinasLuarWebController extends Controller
             'catatan_atasan' => $request->input('catatan_atasan'),
         ]);
 
-        AuditLog::catat('tolak', 'DinasLuar', $dinasLuar->id, "Menolak Dinas Luar ID #{$dinasLuar->id} pegawai {$dinasLuar->pegawai?->nama}");
+        $namaPegawai = $dinasLuar->pegawai->nama ?? '-';
+        AuditLog::catat('tolak', 'DinasLuar', $dinasLuar->id, "Menolak Dinas Luar ID #{$dinasLuar->id} pegawai {$namaPegawai}");
 
         // Send FCM Notification to Pegawai
         if ($dinasLuar->pegawai && $dinasLuar->pegawai->user) {

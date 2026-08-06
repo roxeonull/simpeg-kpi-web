@@ -66,10 +66,10 @@
         <a href="{{ route('cuti.index', array_merge(request()->except('page'), ['status' => 'ditolak'])) }}" 
            class="inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-1.5 text-xs font-semibold tracking-wide transition-all
                   {{ $currentStatus === 'ditolak' 
-                     ? 'border-rose-500 bg-rose-500 text-white' 
+                     ? 'border-kpi-red bg-kpi-red text-white' 
                      : 'border-kpi-line bg-white/40 text-kpi-gray hover:bg-stone-50 dark:border-white/10 dark:bg-white/5 dark:text-stone-300 dark:hover:bg-white/10' }}">
             Ditolak
-            <span class="mono ml-1 px-1.5 py-0.5 rounded-full text-[10px] {{ $currentStatus === 'ditolak' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-400' }}">
+            <span class="mono ml-1 px-1.5 py-0.5 rounded-full text-[10px] {{ $currentStatus === 'ditolak' ? 'bg-white/20 text-white' : 'bg-kpi-red-soft text-kpi-red-dark dark:bg-kpi-red/20 dark:text-red-300' }}">
                 {{ $counts['ditolak'] }}
             </span>
         </a>
@@ -92,25 +92,27 @@
                     $jcOptions[] = ['value' => (string)$jc->id, 'label' => $jc->nama];
                 }
             @endphp
-            <x-select name="jenis_cuti" :value="$filters['jenis_cuti'] ?? ''" :options="$jcOptions" class="w-full sm:w-52" />
+            <x-select name="jenis_cuti_id" :value="$filters['jenis_cuti_id'] ?? ''" :options="$jcOptions" class="w-full sm:w-44" />
             <button class="btn-secondary">Filter</button>
         </form>
 
-        <a href="{{ route('cuti.create') }}" class="btn-primary flex items-center gap-1.5 whitespace-nowrap shadow-[var(--shadow-card-hover)] shrink-0">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-            Tambah Pengajuan
-        </a>
+        @if(!auth()->user()->isPegawaiOnly())
+            <a href="{{ route('cuti.create') }}" class="btn-primary shrink-0">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Pengajuan Cuti
+            </a>
+        @endif
     </div>
 
-    <div id="live-list-container" class="space-y-4">
+    <div id="live-list-container">
         <div class="table-shell">
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-kpi-line bg-kpi-cream/60 dark:border-white/10 dark:bg-white/[0.03]">
                     <tr>
                         <th class="th">Pegawai</th>
-                        <th class="th">Jenis</th>
-                        <th class="th">Periode</th>
-                        <th class="th">Hari</th>
+                        <th class="th">Jenis Cuti</th>
+                        <th class="th">Tanggal</th>
+                        <th class="th">Durasi</th>
                         <th class="th">Status</th>
                         <th class="th text-right">Aksi</th>
                     </tr>
@@ -136,11 +138,13 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6">
-                            <div class="empty-state">
-                                <svg class="h-8 w-8 text-kpi-gray/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <p class="text-sm text-kpi-gray">Belum ada pengajuan cuti.</p>
-                            </div>
+                        <tr><td colspan="6" class="p-4">
+                            <x-empty-state
+                                icon="calendar"
+                                title="Belum Ada Pengajuan Cuti"
+                                description="Tidak ada data pengajuan cuti yang sesuai dengan filter."
+                                :resetUrl="route('cuti.index')"
+                                resetLabel="Reset Filter" />
                         </td></tr>
                     @endforelse
                 </tbody>

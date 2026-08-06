@@ -299,14 +299,16 @@
                 {{-- Header --}}
                 <div class="flex items-center justify-between border-b border-kpi-line pb-3 dark:border-white/10">
                     <div class="flex items-center gap-2.5">
-                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/15">
-                            <svg class="h-4 w-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center justify-between border-b border-kpi-line pb-3 dark:border-white/10">
+                    <div class="flex items-center gap-2.5">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-kpi-red-soft dark:bg-kpi-red/20">
+                            <svg class="h-4 w-4 text-kpi-red dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
                         </span>
                         <div>
-                            <h3 class="font-serif text-base font-semibold text-rose-700 dark:text-rose-400">Konfirmasi Hapus Data Jadwal</h3>
+                            <h3 class="font-serif text-base font-semibold text-kpi-red-dark dark:text-red-300">Konfirmasi Hapus Data Jadwal</h3>
                             <p class="text-xs text-kpi-gray mt-0.5">Tindakan ini tidak dapat dibatalkan</p>
                         </div>
                     </div>
@@ -324,29 +326,29 @@
                         Anda akan menghapus <strong>seluruh data jadwal</strong> berikut:
                     </p>
 
-                    <div class="rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 p-4 space-y-2.5">
+                    <div class="rounded-xl bg-kpi-red-soft/70 dark:bg-kpi-red/15 border border-red-200 dark:border-red-500/20 p-4 space-y-2.5">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-kpi-gray font-medium">Shift</span>
-                            <span class="font-bold text-rose-700 dark:text-rose-400">
+                            <span class="font-bold text-kpi-red-dark dark:text-red-300">
                                 Shift {{ $shift }} ({{ $shift == '1' ? '06.00–14.00' : ($shift == '2' ? '14.00–22.00' : '22.00–06.00') }})
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-kpi-gray font-medium">Periode</span>
-                            <span class="font-bold text-rose-700 dark:text-rose-400">
+                            <span class="font-bold text-kpi-red-dark dark:text-red-300">
                                 @php
                                     $monthsIndo = ['01'=>'Januari','02'=>'Februari','03'=>'Maret','04'=>'April','05'=>'Mei','06'=>'Juni','07'=>'Juli','08'=>'Agustus','09'=>'September','10'=>'Oktober','11'=>'November','12'=>'Desember'];
                                 @endphp
                                 {{ ($monthsIndo[$month] ?? $month) . ' ' . $year }}
                             </span>
                         </div>
-                        <div class="border-t border-rose-200 dark:border-rose-500/20 pt-2.5 grid grid-cols-2 gap-2">
+                        <div class="border-t border-red-200 dark:border-red-500/20 pt-2.5 grid grid-cols-2 gap-2">
                             <div class="text-center">
-                                <p class="text-2xl font-bold text-rose-700 dark:text-rose-400" x-text="hapusJumlahEntri"></p>
+                                <p class="text-2xl font-bold text-kpi-red dark:text-red-300" x-text="hapusJumlahEntri"></p>
                                 <p class="text-[11px] text-kpi-gray mt-0.5">Total entry yang dihapus</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-2xl font-bold text-rose-700 dark:text-rose-400" x-text="hapusJumlahPegawai"></p>
+                                <p class="text-2xl font-bold text-kpi-red dark:text-red-300" x-text="hapusJumlahPegawai"></p>
                                 <p class="text-[11px] text-kpi-gray mt-0.5">Pegawai terdampak</p>
                             </div>
                         </div>

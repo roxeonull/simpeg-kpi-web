@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->role === 'pegawai';
     }
+
+    public function isPegawaiOnly(): bool
+    {
+        return $this->role === 'pegawai';
+    }
 }

@@ -19,6 +19,8 @@
         {{-- Form --}}
         <form method="POST"
               action="{{ $user->exists ? route('user.update', $user) : route('user.store') }}"
+              x-data="{ submitting: false }"
+              @submit="submitting = true"
               class="space-y-5">
             @csrf
             @if($user->exists) @method('PUT') @endif
@@ -28,41 +30,41 @@
                 <h3 class="font-semibold text-sm text-kpi-black dark:text-stone-100">Informasi Akun</h3>
 
                 <div>
-                    <label for="name" class="label">Nama Lengkap <span class="text-rose-500">*</span></label>
+                    <label for="name" class="label">Nama Lengkap <span class="text-kpi-red">*</span></label>
                     <input type="text" id="name" name="name"
                            value="{{ old('name', $user->name) }}"
-                           class="input mt-1 w-full @error('name') border-rose-400 @enderror"
+                           class="input mt-1 w-full @error('name') border-kpi-red @enderror"
                            required placeholder="Nama lengkap pengguna">
                     @error('name')
-                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="email" class="label">Email <span class="text-rose-500">*</span></label>
+                    <label for="email" class="label">Email <span class="text-kpi-red">*</span></label>
                     <input type="email" id="email" name="email"
                            value="{{ old('email', $user->email) }}"
-                           class="input mt-1 w-full @error('email') border-rose-400 @enderror"
+                           class="input mt-1 w-full @error('email') border-kpi-red @enderror"
                            required placeholder="email@kpi.go.id">
                     @error('email')
-                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="password" class="label">
-                        Password <span class="text-rose-500">*</span>
+                        Password <span class="text-kpi-red">*</span>
                         @if($user->exists)
                             <span class="ml-1 text-[11px] font-normal text-kpi-gray">(kosongkan jika tidak ingin mengubah)</span>
                         @endif
                     </label>
                     <input type="password" id="password" name="password"
-                           class="input mt-1 w-full @error('password') border-rose-400 @enderror"
+                           class="input mt-1 w-full @error('password') border-kpi-red @enderror"
                            {{ $user->exists ? '' : 'required' }}
                            minlength="8"
                            placeholder="{{ $user->exists ? '••••••••' : 'Minimal 8 karakter' }}">
                     @error('password')
-                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
@@ -73,7 +75,7 @@
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="role" class="label">Role <span class="text-rose-500">*</span></label>
+                        <label for="role" class="label">Role <span class="text-kpi-red">*</span></label>
                         <x-select id="role" name="role"
                             :value="old('role', $user->role ?? '')"
                             :options="[
@@ -82,23 +84,23 @@
                                 ['value' => 'atasan', 'label' => 'Atasan'],
                                 ['value' => 'pegawai', 'label' => 'Pegawai'],
                             ]"
-                            class="mt-1 w-full @error('role') border-rose-400 @enderror" />
+                            class="mt-1 w-full @error('role') border-kpi-red @enderror" />
                         @error('role')
-                            <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="is_active" class="label">Status Akun <span class="text-rose-500">*</span></label>
+                        <label for="is_active" class="label">Status Akun <span class="text-kpi-red">*</span></label>
                         <x-select id="is_active" name="is_active"
                             :value="old('is_active', $user->exists ? (string)(int)$user->is_active : '1')"
                             :options="[
                                 ['value' => '1', 'label' => 'Aktif'],
                                 ['value' => '0', 'label' => 'Nonaktif'],
                             ]"
-                            class="mt-1 w-full @error('is_active') border-rose-400 @enderror" />
+                            class="mt-1 w-full @error('is_active') border-kpi-red @enderror" />
                         @error('is_active')
-                            <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                            <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -125,9 +127,9 @@
                         :value="$selectedPegawai"
                         :options="$pegawaiOptions"
                         placeholder="Cari pegawai..."
-                        class="mt-1 w-full @error('pegawai_id') border-rose-400 @enderror" />
+                        class="mt-1 w-full @error('pegawai_id') border-kpi-red @enderror" />
                     @error('pegawai_id')
-                        <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-kpi-red">{{ $message }}</p>
                     @enderror
                     <p class="mt-1.5 text-[11px] text-kpi-gray">
                         Hanya menampilkan pegawai yang belum memiliki akun login.
@@ -141,9 +143,13 @@
             {{-- Tombol Simpan --}}
             <div class="flex items-center justify-end gap-3">
                 <a href="{{ route('user.index') }}" class="btn-secondary">Batal</a>
-                <button type="submit" class="btn-primary">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    {{ $user->exists ? 'Simpan Perubahan' : 'Buat Akun' }}
+                <button type="submit" :disabled="submitting" class="btn-primary flex items-center gap-2">
+                    <svg x-show="!submitting" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <svg x-show="submitting" x-cloak class="h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span x-text="submitting ? 'Menyimpan...' : '{{ $user->exists ? 'Simpan Perubahan' : 'Buat Akun' }}'"></span>
                 </button>
             </div>
         </form>

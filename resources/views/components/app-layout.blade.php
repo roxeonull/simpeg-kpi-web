@@ -270,7 +270,7 @@
                         </div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                            <button type="submit" class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-kpi-red hover:bg-kpi-red-soft dark:hover:bg-kpi-red/10">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 Keluar
                             </button>
@@ -280,24 +280,60 @@
             </div>
         </header>
 
-        <main class="flex-1 px-4 py-6 sm:px-6 lg:py-8 min-w-0">
-            @if (session('status'))
-                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    <span>{{ session('status') }}</span>
+        {{-- Floating Toast Notifications Container --}}
+        <div x-data="{ 
+                showSuccess: {{ (session('status') || session('success')) ? 'true' : 'false' }}, 
+                showError: {{ (session('error') || $errors->any()) ? 'true' : 'false' }},
+                init() {
+                    if (this.showSuccess) setTimeout(() => this.showSuccess = false, 4500);
+                    if (this.showError) setTimeout(() => this.showError = false, 6500);
+                }
+             }" 
+             class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
+             
+            <template x-if="showSuccess">
+                <div x-show="showSuccess" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-2 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="pointer-events-auto flex items-center gap-3 rounded-2xl border border-emerald-300 bg-white/95 p-4 shadow-xl backdrop-blur-md dark:border-emerald-500/30 dark:bg-kpi-dark-surface/95">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div class="flex-1 text-xs font-medium text-stone-800 dark:text-stone-200">
+                        <p class="font-bold text-sm text-emerald-700 dark:text-emerald-400">Berhasil</p>
+                        <p class="mt-0.5">{{ session('status') ?? session('success') }}</p>
+                    </div>
+                    <button @click="showSuccess = false" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
-            @endif
-            @if ($errors->any())
-                <div class="mb-5 flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
-                    <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
-                    <ul class="list-inside list-disc space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            </template>
 
+            <template x-if="showError">
+                <div x-show="showError" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-2 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="pointer-events-auto flex items-start gap-3 rounded-2xl border border-red-300 bg-white/95 p-4 shadow-xl backdrop-blur-md dark:border-red-500/30 dark:bg-kpi-dark-surface/95">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-kpi-red-soft text-kpi-red dark:bg-kpi-red/20 dark:text-red-300">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                    </div>
+                    <div class="flex-1 text-xs text-stone-800 dark:text-stone-200">
+                        <p class="font-bold text-sm text-kpi-red dark:text-red-400">Terjadi Kesalahan</p>
+                        @if(session('error'))
+                            <p class="mt-0.5">{{ session('error') }}</p>
+                        @endif
+                        @if($errors->any())
+                            <ul class="mt-1 list-inside list-disc space-y-0.5">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                    <button @click="showError = false" class="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        <main class="flex-1 px-4 py-6 sm:px-6 lg:py-8 min-w-0">
             {{ $slot }}
         </main>
     </div>

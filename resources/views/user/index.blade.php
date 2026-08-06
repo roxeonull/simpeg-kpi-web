@@ -14,7 +14,7 @@
                 <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Akun Aktif</p>
                 <p class="stat-figure mt-2 text-emerald-600 dark:text-emerald-400">{{ $aktifCount }}</p>
                 <p class="mt-3 text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
-                    <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>{{ $nonaktifCount }} nonaktif
+                    <span class="h-1.5 w-1.5 rounded-full bg-kpi-red"></span>{{ $nonaktifCount }} nonaktif
                 </p>
             </div>
             <div class="card card-glow-red group transition-all duration-300 hover:-translate-y-1 animate-fade-in-up" style="animation-delay:150ms">
@@ -211,8 +211,15 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="empty-state">
-                                    <p class="text-sm text-kpi-gray">Tidak ada akun user yang ditemukan.</p>
+                                <td colspan="6" class="p-4">
+                                    <x-empty-state
+                                        icon="users"
+                                        title="Tidak Ada Akun User"
+                                        description="Tidak ada data akun user yang sesuai dengan kata kunci atau filter yang Anda pilih."
+                                        :resetUrl="route('user.index')"
+                                        resetLabel="Reset Filter"
+                                        :actionUrl="route('user.create')"
+                                        actionLabel="Tambah User Baru" />
                                 </td>
                             </tr>
                         @endforelse

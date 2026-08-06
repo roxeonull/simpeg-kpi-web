@@ -105,11 +105,11 @@
 
                 <button type="button" @click="statusFilter = 'ditolak'" 
                         :class="statusFilter === 'ditolak' 
-                           ? 'border-rose-600 bg-rose-600 text-white shadow-sm' 
+                           ? 'border-kpi-red bg-kpi-red text-white shadow-sm' 
                            : 'border-kpi-line bg-white text-kpi-gray hover:bg-stone-50 dark:border-white/10 dark:bg-kpi-dark-surface dark:text-stone-300 dark:hover:bg-white/5'"
                         class="inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all">
                     Ditolak
-                    <span class="mono rounded-full px-1.5 py-0.5 text-[10px]" :class="statusFilter === 'ditolak' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300'">
+                    <span class="mono rounded-full px-1.5 py-0.5 text-[10px]" :class="statusFilter === 'ditolak' ? 'bg-white/20 text-white' : 'bg-kpi-red-soft text-kpi-red-dark dark:bg-kpi-red/20 dark:text-red-300'">
                         {{ $counts['ditolak'] }}
                     </span>
                 </button>
@@ -277,7 +277,7 @@
                                         <span class="font-semibold text-kpi-black dark:text-stone-200">{{ $p->diprosesOleh?->name ?? 'Admin HR' }}</span>
                                     </div>
                                     @if($p->catatan_admin)
-                                        <div class="mt-2 border-t border-kpi-line pt-2 text-rose-700 dark:text-rose-300">
+                                        <div class="mt-2 border-t border-kpi-line pt-2 text-kpi-red dark:text-red-300">
                                             <strong>Catatan Penolakan:</strong>
                                             <p class="mt-1 font-serif text-stone-700 dark:text-stone-300">{{ $p->catatan_admin }}</p>
                                         </div>
@@ -304,11 +304,11 @@
                                     </div>
 
                                     {{-- Form In-Place Penolakan --}}
-                                    <div x-show="showTolakForm" x-cloak class="rounded-xl border border-rose-200 bg-rose-50/60 p-4 dark:border-rose-500/20 dark:bg-rose-500/[0.04]">
+                                    <div x-show="showTolakForm" x-cloak class="rounded-xl border border-red-200 bg-kpi-red-soft/60 p-4 dark:border-red-500/20 dark:bg-kpi-red/[0.08]">
                                         <form method="POST" action="{{ route('pengajuan-perubahan.tolak', $p) }}" class="space-y-3">
                                             @csrf @method('PATCH')
                                             <div>
-                                                <label class="label text-xs font-bold text-rose-800 dark:text-rose-300">Alasan / Catatan Penolakan (Opsional)</label>
+                                                <label class="label text-xs font-bold text-kpi-red-dark dark:text-red-300">Alasan / Catatan Penolakan (Opsional)</label>
                                                 <textarea name="catatan_admin" rows="3" class="input mt-1 w-full text-xs" placeholder="Tuliskan alasan mengapa perubahan ini ditolak..."></textarea>
                                             </div>
                                             <div class="flex justify-end gap-2">

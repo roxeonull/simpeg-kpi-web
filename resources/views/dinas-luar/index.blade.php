@@ -42,8 +42,8 @@
         </div>
 
         {{-- Filter & Action Bar --}}
-        <div class="card p-4 sm:p-5">
-            <form method="GET" action="{{ route('dinas-luar.index') }}" x-data="{ submit() { $el.submit(); } }" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div class="card relative z-40 p-4 sm:p-5">
+            <form method="GET" action="{{ route('dinas-luar.index') }}" x-data="{ submit() { $el.submit(); } }" @change="submit()" class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                     {{-- Search Input --}}
                     <div class="relative flex-1">
@@ -56,13 +56,15 @@
                         </svg>
                     </div>
 
-                    {{-- Status Dropdown --}}
-                    <select name="status" @change="submit()" class="rounded-xl border border-kpi-line bg-white/80 px-3.5 py-2.5 text-sm dark:border-white/10 dark:bg-kpi-dark-surface dark:text-stone-100">
-                        <option value="">— Semua Status —</option>
-                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu (Pending)</option>
-                        <option value="disetujui" {{ request('status') === 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                    </select>
+                    {{-- Custom Design Status Dropdown --}}
+                    <div class="w-full sm:w-52">
+                        <x-select name="status" :value="request('status')" :options="[
+                            ['value' => '', 'label' => 'Semua Status'],
+                            ['value' => 'pending', 'label' => 'Menunggu (Pending)'],
+                            ['value' => 'disetujui', 'label' => 'Disetujui'],
+                            ['value' => 'ditolak', 'label' => 'Ditolak']
+                        ]" class="w-full" />
+                    </div>
 
                     @if(request()->anyFilled(['search', 'status']))
                         <a href="{{ route('dinas-luar.index') }}" class="inline-flex items-center justify-center px-3.5 py-2.5 text-xs font-semibold text-kpi-gray hover:text-kpi-red">
