@@ -220,11 +220,17 @@
                 </table>
             </div>
 
-            @if($dinasLuars->hasPages())
-                <div class="border-t border-kpi-line p-4 dark:border-white/10">
+            <div class="border-t border-kpi-line p-4 dark:border-white/10 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-2.5">
+                    <x-per-page :current="request('per_page', 15)" />
+                    <span class="text-xs text-kpi-gray dark:text-stone-400">
+                        (Total <strong class="text-kpi-black dark:text-stone-200">{{ $dinasLuars->total() }}</strong> entri)
+                    </span>
+                </div>
+                <div class="clean-pagination">
                     {{ $dinasLuars->links() }}
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </x-app-layout>

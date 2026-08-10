@@ -227,15 +227,18 @@
                 </table>
             </div>
 
-            {{-- Pagination --}}
-            @if($users->hasPages())
-                <div class="mt-4 flex items-center justify-between px-1">
-                    <p class="text-xs text-kpi-gray">
-                        Menampilkan {{ $users->firstItem() }}–{{ $users->lastItem() }} dari {{ $users->total() }} akun
-                    </p>
+            {{-- Pagination Footer --}}
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-kpi-line pt-4 dark:border-white/10 px-1">
+                <div class="flex items-center gap-2.5">
+                    <x-per-page :current="request('per_page', 15)" />
+                    <span class="text-xs text-kpi-gray dark:text-stone-400">
+                        (Total <strong class="text-kpi-black dark:text-stone-200">{{ $users->total() }}</strong> akun)
+                    </span>
+                </div>
+                <div class="clean-pagination">
                     {{ $users->links() }}
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </x-app-layout>

@@ -86,8 +86,18 @@ class DashboardController extends Controller
             ->filter(fn ($p) => ($p->total_jp ?? 0) >= $targetJp)
             ->count();
 
-        // 6. Grafik Mingguan Kehadiran
-        $grafikMingguan = collect(range(6, 0))->map(function ($i) use ($scopePegawaiIds) {
+        // 6. Grafik Kehadiran (Filter Periode: 7 Hari / 30 Hari / Bulan Ini)
+        $periode = $request->get('periode', '7');
+        if ($periode === '30') {
+            $days = 29;
+        } elseif ($periode === 'bulan_ini') {
+            $days = max(0, now()->day - 1);
+        } else {
+            $periode = '7';
+            $days = 6;
+        }
+
+        $grafikMingguan = collect(range($days, 0))->map(function ($i) use ($scopePegawaiIds, $periode) {
             $tanggal = now()->subDays($i);
             $hadir = Absensi::when($scopePegawaiIds, fn ($q) => $q->whereIn('pegawai_id', $scopePegawaiIds))
                 ->whereDate('tanggal', $tanggal->toDateString())
@@ -95,10 +105,17 @@ class DashboardController extends Controller
                 ->count();
 
             return [
-                'label' => $tanggal->translatedFormat('D'),
+                'label' => in_array($periode, ['30', 'bulan_ini']) ? $tanggal->format('d/m') : $tanggal->translatedFormat('D'),
                 'total' => $hadir,
             ];
         });
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'labels' => $grafikMingguan->pluck('label'),
+                'totals' => $grafikMingguan->pluck('total'),
+            ]);
+        }
 
         // 7. Presensi Hari Ini Rincian
         $jamPulang = \App\Models\Pengaturan::get('jam_pulang', '16:30');
@@ -139,6 +156,7 @@ class DashboardController extends Controller
             'pegawaiCapaianDiklat' => $pegawaiCapaianDiklat,
             'targetJp' => $targetJp,
             'grafikMingguan' => $grafikMingguan,
+            'selectedPeriode' => $periode,
             'aktivitasTerbaru' => $aktivitasTerbaru,
             'rincianKehadiran' => [
                 'hadir' => $hadirCount,

@@ -76,14 +76,56 @@
                     <label class="label">Bentuk Pelatihan *</label>
                     <x-select name="bentuk_pelatihan_id" value="" :options="$bentukOptions" class="w-full" />
                 </div>
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-2" x-data="{
+                         open: false,
+                         selectedId: '',
+                         selectedLabel: '— Pilih Tipe Kursus —',
+                         init() {
+                             this.$watch('bentukId', () => {
+                                 this.selectedId = '';
+                                 this.selectedLabel = '— Pilih Tipe Kursus —';
+                                 if (this.$refs.hiddenInput) this.$refs.hiddenInput.value = '';
+                             });
+                         },
+                         selectTipe(tipe) {
+                             this.selectedId = tipe ? tipe.id : '';
+                             this.selectedLabel = tipe ? tipe.nama_tipe : '— Pilih Tipe Kursus —';
+                             this.open = false;
+                             this.$refs.hiddenInput.value = this.selectedId;
+                             this.$refs.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+                         }
+                     }" @click.outside="open = false" class="relative">
                     <label class="label">Tipe Kursus *</label>
-                    <select name="tipe_kursus_id" class="flex w-full items-center justify-between gap-2.5 rounded-xl border border-stone-200 bg-white/90 px-3.5 py-2.5 text-sm font-medium text-kpi-black shadow-[var(--shadow-card)] backdrop-blur-md transition-all duration-200 hover:border-stone-300 focus:border-kpi-red focus:outline-none focus:ring-2 focus:ring-kpi-red/15 dark:border-white/5 dark:bg-kpi-dark-surface/90 dark:text-stone-100 disabled:opacity-50" :disabled="!bentukId" required>
-                        <option value="">— Pilih Tipe Kursus —</option>
-                        <template x-for="tipe in getFilteredTipe()" :key="tipe.id">
-                            <option :value="tipe.id" x-text="tipe.nama_tipe"></option>
-                        </template>
-                    </select>
+                    <input type="hidden" name="tipe_kursus_id" x-ref="hiddenInput" :value="selectedId" required>
+                    
+                    <button type="button" @click="if (bentukId) open = !open"
+                            :disabled="!bentukId"
+                            class="flex w-full items-center justify-between gap-2.5 rounded-xl border border-stone-200 bg-white/90 px-3.5 py-2.5 text-sm font-medium text-kpi-black shadow-sm transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 focus:border-kpi-red focus:outline-none focus:ring-2 focus:ring-kpi-red/15 dark:border-white/10 dark:bg-kpi-dark-surface dark:text-stone-100 dark:hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span x-text="!bentukId ? '— Pilih Bentuk Dulu —' : selectedLabel" class="truncate"></span>
+                        <svg class="h-4 w-4 shrink-0 text-kpi-gray transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="open && bentukId"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 z-[100] mt-1.5 max-h-60 w-full min-w-full overflow-y-auto rounded-2xl border border-stone-200 bg-white py-1.5 shadow-2xl dark:border-white/15 dark:bg-[#25211B]"
+                         x-cloak>
+                        <div class="px-1 space-y-0.5">
+                            <template x-for="tipe in getFilteredTipe()" :key="tipe.id">
+                                <button type="button" @click="selectTipe(tipe)"
+                                        class="flex w-full items-center rounded-xl px-3 py-2 text-left text-sm text-kpi-black transition-colors hover:bg-kpi-cream/60 dark:text-stone-200 dark:hover:bg-white/[0.03]"
+                                        :class="{ 'bg-kpi-cream/40 font-semibold text-kpi-red dark:text-kpi-gold': selectedId == tipe.id }">
+                                    <span x-text="tipe.nama_tipe" class="truncate"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                 </div>
                 <div class="sm:col-span-2">
                     <label class="label">Jenis Kursus *</label>

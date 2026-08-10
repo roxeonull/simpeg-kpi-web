@@ -194,7 +194,17 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4">{{ $pelatihans->links() }}</div>
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-kpi-line pt-4 dark:border-white/10">
+                    <div class="flex items-center gap-2.5">
+                        <x-per-page :current="request('per_page', 15)" />
+                        <span class="text-xs text-kpi-gray dark:text-stone-400">
+                            (Total <strong class="text-kpi-black dark:text-stone-200">{{ $pelatihans->total() }}</strong> entri)
+                        </span>
+                    </div>
+                    <div class="clean-pagination">
+                        {{ $pelatihans->links() }}
+                    </div>
+                </div>
             </div>
         </div>
 

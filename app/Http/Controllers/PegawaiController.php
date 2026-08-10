@@ -41,7 +41,8 @@ class PegawaiController extends Controller
             $query->where('status_aktif', $statusAktif);
         }
 
-        $pegawais = $query->orderBy('nama')->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 15, 25, 50]) ? (int) $request->get('per_page') : 15;
+        $pegawais = $query->orderBy('nama')->paginate($perPage)->withQueryString();
 
         // 1. Total Pegawai
         $totalPegawai = Pegawai::count();
@@ -82,7 +83,7 @@ class PegawaiController extends Controller
         return view('pegawai.index', [
             'pegawais'           => $pegawais,
             'units'              => UnitKerja::orderBy('nama_unit')->get(),
-            'filters'            => $request->only(['q', 'unit_id', 'status_kepegawaian', 'status_aktif']),
+            'filters'            => $request->only(['q', 'unit_id', 'status_kepegawaian', 'status_aktif', 'per_page']),
             'totalPegawai'       => $totalPegawai,
             'aktifCount'         => $aktifCount,
             'nonaktifCount'      => $nonaktifCount,

@@ -39,7 +39,8 @@ class RiwayatPelatihanController extends Controller
             $query->where('kategori', $kategori);
         }
 
-        $pelatihans = $query->latest('tanggal')->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 15, 25, 50]) ? (int) $request->get('per_page') : 15;
+        $pelatihans = $query->latest('tanggal')->paginate($perPage)->withQueryString();
 
         $targetJp = 20;
 
@@ -69,7 +70,7 @@ class RiwayatPelatihanController extends Controller
 
         return view('pelatihan.index', [
             'pelatihans' => $pelatihans,
-            'filters' => $request->only(['q', 'status_verifikasi', 'kategori']),
+            'filters' => $request->only(['q', 'status_verifikasi', 'kategori', 'per_page']),
             'rekapPegawai' => $rekapPegawai,
             'targetJp' => $targetJp,
             'totalPegawai' => $totalPegawai,

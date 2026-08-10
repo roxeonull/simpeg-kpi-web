@@ -588,5 +588,152 @@
         });
     });
 </script>
+
+{{-- ════════════════════════════════════════════════════════════════
+     GLOBAL: Loading State — Tombol Submit & Page Progress Bar
+     Mencegah double-submit dan memberi feedback visual loading
+     ════════════════════════════════════════════════════════════════ --}}
+
+{{-- Top progress bar (muncul saat navigasi halaman) --}}
+<div id="page-progress-bar"
+     style="position:fixed;top:0;left:0;z-index:9999;height:3px;width:0%;
+            background:linear-gradient(90deg,#C1272D,#B4872A,#C1272D);
+            background-size:200% 100%;
+            transition:width 0.3s ease,opacity 0.3s ease;
+            opacity:0;pointer-events:none;
+            animation:progressShimmer 1.2s linear infinite;"></div>
+<style>
+    @keyframes progressShimmer {
+        0%   { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Loading spinner yang di-inject ke dalam tombol */
+    .btn-loading-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: btnSpin 0.65s linear infinite;
+        flex-shrink: 0;
+    }
+    .btn-loading-spinner-dark {
+        border-color: rgba(193,39,45,0.25);
+        border-top-color: #C1272D;
+    }
+    /* Tombol saat loading */
+    button[data-loading="true"],
+    input[type="submit"][data-loading="true"] {
+        opacity: 0.75 !important;
+        pointer-events: none !important;
+        cursor: not-allowed !important;
+    }
+    @keyframes btnSpin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const progressBar = document.getElementById('page-progress-bar');
+
+    /* ── Progress bar helper ── */
+    function startProgress() {
+        if (!progressBar) return;
+        progressBar.style.width   = '0%';
+        progressBar.style.opacity = '1';
+        // Simulate fast fill to 80%, then hold
+        requestAnimationFrame(() => {
+            progressBar.style.transition = 'width 0.4s ease';
+            progressBar.style.width      = '30%';
+            setTimeout(() => { progressBar.style.width = '75%'; }, 400);
+        });
+    }
+    function finishProgress() {
+        if (!progressBar) return;
+        progressBar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.15s';
+        progressBar.style.width      = '100%';
+        setTimeout(() => { progressBar.style.opacity = '0'; progressBar.style.width = '0%'; }, 600);
+    }
+
+    /* ── Inject loading state ke tombol submit saat form di-submit ── */
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+
+        // Jangan terapkan pada GET forms (form filter/search, tidak perlu loading state)
+        if ((form.method || '').toLowerCase() === 'get') return;
+
+        // Jangan terapkan jika form sudah punya data-no-loading
+        if (form.dataset.noLoading) return;
+
+        // Cari tombol submit yang ditekan
+        const submitBtn = form.querySelector(
+            'button[type="submit"]:not([data-no-loading]),' +
+            'button:not([type]):not([data-no-loading]),' +
+            'input[type="submit"]:not([data-no-loading])'
+        );
+
+        if (submitBtn && submitBtn.dataset.loading !== 'true') {
+            submitBtn.dataset.loading = 'true';
+
+            // Simpan konten asli
+            const originalHTML = submitBtn.innerHTML;
+            const originalText = submitBtn.textContent.trim();
+            const isIconBtn    = submitBtn.querySelector('svg') !== null;
+
+            // Tentukan warna spinner berdasarkan style tombol
+            const isDarkBtn = submitBtn.classList.contains('btn-secondary') ||
+                              submitBtn.classList.contains('btn-ghost');
+            const spinnerClass = isDarkBtn ? 'btn-loading-spinner btn-loading-spinner-dark' : 'btn-loading-spinner';
+
+            // Inject spinner
+            if (isIconBtn) {
+                submitBtn.innerHTML =
+                    `<span class="${spinnerClass}"></span>` +
+                    `<span>Menyimpan...</span>`;
+            } else {
+                submitBtn.innerHTML =
+                    `<span class="${spinnerClass}"></span>` +
+                    `<span>${originalText || 'Menyimpan...'}</span>`;
+            }
+
+            // Start progress bar untuk navigasi
+            startProgress();
+
+            // Safety: restore setelah 12 detik jika tidak redirect
+            setTimeout(() => {
+                if (submitBtn.dataset.loading === 'true') {
+                    submitBtn.dataset.loading = 'false';
+                    submitBtn.innerHTML = originalHTML;
+                    finishProgress();
+                }
+            }, 12000);
+        }
+    }, true); // capture phase agar jalan sebelum event lain
+
+    /* ── Progress bar untuk klik link navigasi (a href biasa) ── */
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('a[href]');
+        if (!link) return;
+        const href = link.getAttribute('href');
+        // Hanya navigasi internal, bukan anchor / download / external
+        if (!href || href.startsWith('#') || href.startsWith('javascript') ||
+            link.target === '_blank' || link.download ||
+            link.dataset.noProgress || link.closest('form')) return;
+
+        // Jangan trigger pada pagination AJAX (sudah ada handler-nya)
+        if (link.closest('.pagination') || href.includes('page=')) return;
+
+        startProgress();
+    });
+
+    /* ── Finish progress saat halaman selesai load ── */
+    window.addEventListener('load', finishProgress);
+    window.addEventListener('pageshow', finishProgress);
+});
+</script>
+
 </body>
 </html>

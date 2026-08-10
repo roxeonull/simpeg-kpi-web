@@ -59,13 +59,14 @@ class CutiController extends Controller
             $query->whereHas('pegawai', fn ($q) => $q->where('nama', 'like', "%{$search}%"));
         }
 
-        $cutis = $query->latest('tanggal_mulai')->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 15, 25, 50]) ? (int) $request->get('per_page') : 15;
+        $cutis = $query->latest('tanggal_mulai')->paginate($perPage)->withQueryString();
         $jenisCutis = \App\Models\JenisCuti::orderBy('nama')->get();
 
         return view('cuti.index', [
             'cutis' => $cutis,
             'counts' => $counts,
-            'filters' => $request->only(['status', 'jenis_cuti', 'q']),
+            'filters' => $request->only(['status', 'jenis_cuti', 'q', 'per_page']),
             'isAtasan' => $user->role === 'atasan',
             'jenisCutis' => $jenisCutis,
         ]);

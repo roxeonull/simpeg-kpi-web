@@ -266,14 +266,24 @@
         
         {{-- Weekly Line Chart Area --}}
         <div class="card lg:col-span-2 shadow-[var(--shadow-card)] animate-fade-in-up" style="animation-delay: 250ms;">
-            <div class="mb-4 flex items-center justify-between">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <div>
-                    <h2 class="font-serif text-lg font-semibold">Grafik Kehadiran 7 Hari Terakhir</h2>
+                    <h2 class="font-serif text-lg font-semibold" id="chartTitle">Grafik Kehadiran</h2>
                     <p class="text-xs text-kpi-gray mt-0.5">Tren harian tingkat kehadiran pegawai aktif</p>
                 </div>
-                <span class="badge badge-default">Mingguan</span>
+                <div class="flex items-center gap-2" id="chartPeriodeContainer"
+                     @change="fetchChartData($event.target.value)">
+                    <x-select name="periode" :value="$selectedPeriode ?? '7'" :options="[
+                        ['value' => '7', 'label' => '7 Hari Terakhir'],
+                        ['value' => '30', 'label' => '30 Hari Terakhir'],
+                        ['value' => 'bulan_ini', 'label' => 'Bulan Ini']
+                    ]" size="sm" class="min-w-[155px]" />
+                </div>
             </div>
-            <div class="h-68">
+            <div class="h-68 relative">
+                <div id="chartLoadingOverlay" class="absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-kpi-dark-surface/50 backdrop-blur-[1px] opacity-0 pointer-events-none transition-opacity duration-200">
+                    <span class="btn-loading-spinner btn-loading-spinner-dark"></span>
+                </div>
                 <canvas id="lineChartCanvas"></canvas>
             </div>
         </div>
@@ -294,6 +304,32 @@
             </div>
 
             <script>
+                let lineChartInstance = null;
+
+                function fetchChartData(periode) {
+                    const overlay = document.getElementById('chartLoadingOverlay');
+                    if (overlay) overlay.style.opacity = '1';
+
+                    fetch(`{{ route('dashboard') }}?periode=${periode}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (lineChartInstance && data.labels && data.totals) {
+                            lineChartInstance.data.labels = data.labels;
+                            lineChartInstance.data.datasets[0].data = data.totals;
+                            lineChartInstance.update('active');
+                        }
+                    })
+                    .catch(err => console.error('Chart fetch error:', err))
+                    .finally(() => {
+                        if (overlay) overlay.style.opacity = '0';
+                    });
+                }
+
                 document.addEventListener('DOMContentLoaded', function() {
                     // 1. Weekly Line Chart
                     const lineCanvas = document.getElementById('lineChartCanvas');
@@ -303,7 +339,7 @@
                         gradient.addColorStop(0, 'rgba(193, 39, 45, 0.22)');
                         gradient.addColorStop(1, 'rgba(193, 39, 45, 0.00)');
 
-                        new Chart(ctxLine, {
+                        lineChartInstance = new Chart(ctxLine, {
                             type: 'line',
                             data: {
                                 labels: {!! json_encode($grafikMingguan->pluck('label')) !!},

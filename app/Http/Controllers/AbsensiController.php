@@ -101,7 +101,8 @@ class AbsensiController extends Controller
             $query->where('flag_review', true);
         }
 
-        $absensis = $query->orderBy('pegawai_id')->paginate(20)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 20, 25, 50]) ? (int) $request->get('per_page') : 20;
+        $absensis = $query->orderBy('pegawai_id')->paginate($perPage)->withQueryString();
 
         // Saring $belumPresensiPegawais sesuai filter status
         if ($status) {

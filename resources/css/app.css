@@ -254,4 +254,11 @@
     .animate-fade-in-up {
         animation: fadeInUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
+
+    /* ---------- Clean Pagination (hides duplicate Laravel text) ---------- */
+    .clean-pagination nav > div:last-child > div:first-child,
+    .clean-pagination nav > div:first-child {
+        display: none !important;
+    }
 }
+

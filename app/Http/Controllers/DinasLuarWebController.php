@@ -33,7 +33,8 @@ class DinasLuarWebController extends Controller
             });
         }
 
-        $dinasLuars = $query->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 15, 25, 50]) ? (int) $request->get('per_page') : 15;
+        $dinasLuars = $query->paginate($perPage)->withQueryString();
 
         // Stat counters
         $baseQuery = DinasLuar::query();
@@ -49,7 +50,9 @@ class DinasLuarWebController extends Controller
             'ditolak'  => (clone $baseQuery)->where('status', 'ditolak')->count(),
         ];
 
-        return view('dinas-luar.index', compact('dinasLuars', 'stats'));
+        return view('dinas-luar.index', array_merge(compact('dinasLuars', 'stats'), [
+            'filters' => $request->only(['status', 'search', 'per_page']),
+        ]));
     }
 
     public function setujui(Request $request, $id)

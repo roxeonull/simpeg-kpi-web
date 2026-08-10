@@ -30,7 +30,8 @@ class UserController extends Controller
             $query->where('is_active', (bool) $request->get('is_active'));
         }
 
-        $users = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = in_array((int) $request->get('per_page'), [10, 15, 25, 50]) ? (int) $request->get('per_page') : 15;
+        $users = $query->orderBy('name')->paginate($perPage)->withQueryString();
 
         $totalUsers    = User::count();
         $aktifCount    = User::where('is_active', true)->count();
@@ -43,7 +44,7 @@ class UserController extends Controller
         return view('user.index', array_merge(compact(
             'users', 'totalUsers', 'aktifCount', 'nonaktifCount',
             'adminCount', 'atasanCount', 'pegawaiCount', 'tanpaAkunCount'
-        ), ['filters' => $request->only(['q', 'role', 'is_active'])]));
+        ), ['filters' => $request->only(['q', 'role', 'is_active', 'per_page'])]));
     }
 
     public function create(Request $request)
