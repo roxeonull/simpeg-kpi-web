@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/absensi/keluar',    [AbsensiApiController::class, 'keluar']);
 
     // Cuti
+    Route::get('/jenis-cuti',        [CutiApiController::class, 'jenisCutiOptions']);
     Route::get('/cuti',              [CutiApiController::class, 'index']);
     Route::get('/cuti/saldo',         [CutiApiController::class, 'saldo']);
     Route::get('/cuti/kalender-tim',  [CutiApiController::class, 'kalenderTim']);

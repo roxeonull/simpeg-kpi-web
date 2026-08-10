@@ -202,11 +202,11 @@
                     <input type="text" name="kode_unit" placeholder="Kode" class="input max-w-[90px]">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($units as $u)
-                        <li class="flex items-center justify-between py-2.5 text-sm">
-                            <span>{{ $u->nama_unit }} @if($u->kode_unit)<span class="mono text-xs text-kpi-gray">({{ $u->kode_unit }})</span>@endif</span>
-                            <form method="POST" action="{{ route('pengaturan.unit.destroy', $u) }}" onsubmit="return confirm('Hapus unit ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2.5 text-sm">
+                            <span class="truncate">{{ $u->nama_unit }} @if($u->kode_unit)<span class="mono text-xs text-kpi-gray">({{ $u->kode_unit }})</span>@endif</span>
+                            <form method="POST" action="{{ route('pengaturan.unit.destroy', $u) }}" onsubmit="return confirm('Hapus unit ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -225,11 +225,11 @@
                     <input type="text" name="nama_jabatan" placeholder="Nama jabatan" required class="input">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($jabatans as $j)
-                        <li class="flex items-center justify-between py-2.5 text-sm">
-                            <span>{{ $j->nama_jabatan }}</span>
-                            <form method="POST" action="{{ route('pengaturan.jabatan.destroy', $j) }}" onsubmit="return confirm('Hapus jabatan ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2.5 text-sm">
+                            <span class="truncate">{{ $j->nama_jabatan }}</span>
+                            <form method="POST" action="{{ route('pengaturan.jabatan.destroy', $j) }}" onsubmit="return confirm('Hapus jabatan ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -255,18 +255,18 @@
                         Memotong Saldo Cuti Tahunan
                     </label>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($jenisCutis as $jc)
-                        <li class="flex items-center justify-between py-2.5 text-sm">
-                            <div class="flex flex-col">
-                                <span class="font-medium text-stone-700 dark:text-stone-300">{{ $jc->nama }}</span>
+                        <li class="flex items-center justify-between gap-2 py-2.5 text-sm">
+                            <div class="flex flex-col min-w-0 flex-1">
+                                <span class="font-medium text-stone-700 dark:text-stone-300 truncate">{{ $jc->nama }}</span>
                                 @if($jc->potong_saldo_cuti)
                                     <span class="text-[10px] font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400">Memotong Saldo Cuti</span>
                                 @else
                                     <span class="text-[10px] font-medium text-kpi-gray">Tidak Memotong Saldo</span>
                                 @endif
                             </div>
-                            <form method="POST" action="{{ route('pengaturan.jenis-cuti.destroy', $jc) }}" onsubmit="return confirm('Hapus jenis cuti ini?')">
+                            <form method="POST" action="{{ route('pengaturan.jenis-cuti.destroy', $jc) }}" onsubmit="return confirm('Hapus jenis cuti ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -289,11 +289,11 @@
                     <input type="text" name="nama_bentuk" placeholder="Bentuk pelatihan baru" required class="input">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($bentukPelatihans as $b)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <span>{{ $b->nama_bentuk }}</span>
-                            <form method="POST" action="{{ route('pengaturan.bentuk-pelatihan.destroy', $b) }}" onsubmit="return confirm('Hapus bentuk pelatihan ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <span class="truncate">{{ $b->nama_bentuk }}</span>
+                            <form method="POST" action="{{ route('pengaturan.bentuk-pelatihan.destroy', $b) }}" onsubmit="return confirm('Hapus bentuk pelatihan ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -324,14 +324,14 @@
                         <button class="btn-primary shrink-0 !px-3">+</button>
                     </div>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($tipeKursuses as $tk)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <div>
-                                <span>{{ $tk->nama_tipe }}</span>
-                                <p class="text-xs text-kpi-gray font-semibold">{{ $tk->bentukPelatihan?->nama_bentuk }}</p>
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <div class="min-w-0 flex-1">
+                                <span class="truncate block">{{ $tk->nama_tipe }}</span>
+                                <p class="text-xs text-kpi-gray font-semibold truncate">{{ $tk->bentukPelatihan?->nama_bentuk }}</p>
                             </div>
-                            <form method="POST" action="{{ route('pengaturan.tipe-kursus.destroy', $tk) }}" onsubmit="return confirm('Hapus tipe kursus ini?')">
+                            <form method="POST" action="{{ route('pengaturan.tipe-kursus.destroy', $tk) }}" onsubmit="return confirm('Hapus tipe kursus ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -351,11 +351,11 @@
                     <input type="text" name="nama_jenis" placeholder="Jenis kursus baru" required class="input">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($jenisKursuses as $jk)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <span>{{ $jk->nama_jenis }}</span>
-                            <form method="POST" action="{{ route('pengaturan.jenis-kursus.destroy', $jk) }}" onsubmit="return confirm('Hapus jenis kursus ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <span class="truncate">{{ $jk->nama_jenis }}</span>
+                            <form method="POST" action="{{ route('pengaturan.jenis-kursus.destroy', $jk) }}" onsubmit="return confirm('Hapus jenis kursus ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -375,11 +375,11 @@
                     <input type="text" name="nama_instansi" placeholder="Nama instansi baru" required class="input">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-40 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($instansis as $in)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <span>{{ $in->nama_instansi }}</span>
-                            <form method="POST" action="{{ route('pengaturan.instansi.destroy', $in) }}" onsubmit="return confirm('Hapus instansi ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <span class="truncate">{{ $in->nama_instansi }}</span>
+                            <form method="POST" action="{{ route('pengaturan.instansi.destroy', $in) }}" onsubmit="return confirm('Hapus instansi ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -399,11 +399,11 @@
                     <input type="text" name="nama" placeholder="Jenis ketidakhadiran baru" required class="input">
                     <button class="btn-primary shrink-0 !px-3">+</button>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($jenisKetidakhadirans as $jk)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <span>{{ $jk->nama }}</span>
-                            <form method="POST" action="{{ route('pengaturan.jenis-ketidakhadiran.destroy', $jk) }}" onsubmit="return confirm('Hapus jenis ketidakhadiran ini?')">
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <span class="truncate">{{ $jk->nama }}</span>
+                            <form method="POST" action="{{ route('pengaturan.jenis-ketidakhadiran.destroy', $jk) }}" onsubmit="return confirm('Hapus jenis ketidakhadiran ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>
@@ -430,16 +430,16 @@
                         <button class="btn-primary shrink-0 ml-auto !px-3">+</button>
                     </div>
                 </form>
-                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-1">
+                <ul class="divide-y divide-kpi-line dark:divide-white/5 max-h-48 overflow-y-auto pr-3 sm:pr-4">
                     @forelse ($statusShifts as $ss)
-                        <li class="flex items-center justify-between py-2 text-sm">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded text-xs font-semibold" style="background-color: {{ $ss->warna }}; color: #1f2937">
+                        <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                <span class="px-2 py-0.5 rounded text-xs font-semibold shrink-0" style="background-color: {{ $ss->warna }}; color: #1f2937">
                                     {{ $ss->kode }}
                                 </span>
-                                <span>{{ $ss->nama }}</span>
+                                <span class="truncate">{{ $ss->nama }}</span>
                             </div>
-                            <form method="POST" action="{{ route('pengaturan.status-shift.destroy', $ss) }}" onsubmit="return confirm('Hapus status shift ini?')">
+                            <form method="POST" action="{{ route('pengaturan.status-shift.destroy', $ss) }}" onsubmit="return confirm('Hapus status shift ini?')" class="shrink-0 ml-2">
                                 @csrf @method('DELETE')
                                 <button class="btn-xs-danger">Hapus</button>
                             </form>

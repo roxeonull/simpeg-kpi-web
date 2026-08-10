@@ -125,7 +125,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/cuti/{cuti}', [CutiController::class, 'show'])->name('cuti.show');
         Route::patch('/cuti/{cuti}/setujui-atasan', [CutiController::class, 'approveAtasan'])->name('cuti.approve-atasan');
         Route::patch('/cuti/{cuti}/tolak-atasan', [CutiController::class, 'rejectAtasan'])->name('cuti.reject-atasan');
-        Route::get('/cuti/{cuti}/setujui-step', [CutiController::class, 'approveStep'])->name('cuti.approve-step');
+        Route::patch('/cuti/{cuti}/setujui-step', [CutiController::class, 'approveStep'])->name('cuti.approve-step');
         Route::patch('/cuti/{cuti}/tolak-step', [CutiController::class, 'rejectStep'])->name('cuti.reject-step');
 
         Route::get('/dinas-luar', [DinasLuarWebController::class, 'index'])->name('dinas-luar.index');

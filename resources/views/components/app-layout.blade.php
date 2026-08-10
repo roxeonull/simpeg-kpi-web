@@ -181,7 +181,7 @@
                    :class="sidebarCollapsed ? 'hidden lg:hidden' : 'block'">Operasional</p>
                 <div :class="sidebarCollapsed ? 'block my-2 border-t border-kpi-line/40 dark:border-white/10' : 'hidden'"></div>
                 <x-nav-link route="pelatihan.index" icon="academic-cap" activePattern="pelatihan.*">Pelatihan</x-nav-link>
-                <x-nav-link route="absensi.index" icon="clock" activePattern="absensi.*">Absensi</x-nav-link>
+                <x-nav-link route="absensi.index" icon="clock" activePattern="absensi.*,dinas-luar.*,jadwal-shift.*">Absensi</x-nav-link>
                 <x-nav-link route="cuti.index" icon="calendar" activePattern="cuti.*">Cuti & Izin</x-nav-link>
             </div>
             @endif

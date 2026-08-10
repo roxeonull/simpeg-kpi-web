@@ -103,13 +103,25 @@ class CutiApiController extends Controller
         return response()->json(['data' => $this->format($cuti, detail: true)]);
     }
 
+    public function jenisCutiOptions()
+    {
+        $list = \App\Models\JenisCuti::orderBy('nama')->get()->map(fn ($jc) => [
+            'id' => $jc->id,
+            'nama' => $jc->nama,
+            'potong_saldo_cuti' => (bool) $jc->potong_saldo_cuti,
+        ]);
+
+        return response()->json(['data' => $list]);
+    }
+
     public function store(Request $request)
     {
         $pegawai = $request->user()->pegawai;
         abort_unless($pegawai, 404);
 
         $data = $request->validate([
-            'jenis_cuti' => ['required', 'in:tahunan,sakit,melahirkan,lainnya'],
+            'jenis_cuti_id' => ['nullable', 'exists:jenis_cutis,id'],
+            'jenis_cuti' => ['nullable', 'in:tahunan,sakit,melahirkan,lainnya'],
             'tanggal_mulai' => ['required', 'date', 'after_or_equal:today'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             'alasan' => ['required', 'string', 'max:1000'],
@@ -117,11 +129,39 @@ class CutiApiController extends Controller
             'lampiran' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:4096'],
         ]);
 
+        if (empty($data['jenis_cuti_id']) && empty($data['jenis_cuti'])) {
+            abort(422, 'Jenis cuti wajib dipilih.');
+        }
+
+        if (!empty($data['jenis_cuti_id'])) {
+            $jc = \App\Models\JenisCuti::find($data['jenis_cuti_id']);
+            if ($jc) {
+                $nameLower = strtolower($jc->nama);
+                if (str_contains($nameLower, 'sakit')) {
+                    $data['jenis_cuti'] = 'sakit';
+                } elseif (str_contains($nameLower, 'melahirkan') || str_contains($nameLower, 'bersalin')) {
+                    $data['jenis_cuti'] = 'melahirkan';
+                } elseif (str_contains($nameLower, 'tahunan')) {
+                    $data['jenis_cuti'] = 'tahunan';
+                } else {
+                    $data['jenis_cuti'] = 'lainnya';
+                }
+            }
+        }
+
         $mulai = \Carbon\Carbon::parse($data['tanggal_mulai']);
         $selesai = \Carbon\Carbon::parse($data['tanggal_selesai']);
         $jumlahHari = max(1, $mulai->diffInDaysFiltered(fn ($date) => ! $date->isWeekend(), $selesai->copy()->addDay()));
 
-        if ($data['jenis_cuti'] === 'tahunan') {
+        $isPotongSaldo = false;
+        if (!empty($data['jenis_cuti_id'])) {
+            $jcObj = \App\Models\JenisCuti::find($data['jenis_cuti_id']);
+            $isPotongSaldo = $jcObj ? $jcObj->potong_saldo_cuti : false;
+        } else {
+            $isPotongSaldo = ($data['jenis_cuti'] === 'tahunan');
+        }
+
+        if ($isPotongSaldo) {
             $saldo = $pegawai->saldoCutiTahunIni();
             abort_if($jumlahHari > $saldo->sisa_saldo, 422, "Saldo cuti tidak mencukupi. Sisa saldo Anda: {$saldo->sisa_saldo} hari.");
         }
@@ -142,7 +182,7 @@ class CutiApiController extends Controller
 
         // Send FCM Notification to Atasan if exists
         if ($pegawai->atasan && $pegawai->atasan->user) {
-            $jenisStr = ($cuti->jenisCuti && $cuti->jenisCuti->nama) ? $cuti->jenisCuti->nama : ucfirst($cuti->jenis_cuti);
+            $jenisStr = ($cuti->jenisCuti && $cuti->jenisCuti->nama) ? $cuti->jenisCuti->nama : ucfirst($cuti->jenis_cuti ?? 'cuti');
             $tglStr = $cuti->tanggal_mulai->format('d M') . ' s.d. ' . $cuti->tanggal_selesai->format('d M Y');
             \App\Services\NotificationService::sendToUser(
                 $pegawai->atasan->user,
@@ -186,6 +226,8 @@ class CutiApiController extends Controller
             'unit_pegawai' => ($pegawai && $pegawai->unit) ? $pegawai->unit->nama_unit : null,
             'jabatan_pegawai' => ($pegawai && $pegawai->jabatan) ? $pegawai->jabatan->nama_jabatan : null,
             'jenis_cuti' => $c->jenis_cuti,
+            'jenis_cuti_id' => $c->jenis_cuti_id,
+            'nama_jenis_cuti' => $c->jenisCuti ? $c->jenisCuti->nama : ($c->jenis_cuti ? ucfirst($c->jenis_cuti) : 'Cuti'),
             'tanggal_mulai' => $c->tanggal_mulai->toDateString(),
             'tanggal_selesai' => $c->tanggal_selesai->toDateString(),
             'jumlah_hari' => $c->jumlah_hari,
