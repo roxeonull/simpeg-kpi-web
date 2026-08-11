@@ -39,9 +39,24 @@ class NotificationService
      */
     public static function sendToUser($user, string $title, string $body, array $dataPayload = []): void
     {
-        $userId = $user instanceof User ? $user->id : $user;
-        $tokens = FcmToken::where('user_id', $userId)->get();
+        $userId = $user instanceof User ? $user->id : (int) $user;
 
+        // 1. Always save notification to database history
+        try {
+            \App\Models\AppNotification::create([
+                'user_id' => $userId,
+                'title'   => $title,
+                'body'    => $body,
+                'type'    => $dataPayload['type'] ?? 'sistem',
+                'payload' => $dataPayload,
+                'is_read' => false,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Failed to save database notification for user {$userId}: " . $e->getMessage());
+        }
+
+        // 2. Dispatch Push Notification via FCM if tokens exist
+        $tokens = FcmToken::where('user_id', $userId)->get();
         if ($tokens->isEmpty()) {
             return;
         }

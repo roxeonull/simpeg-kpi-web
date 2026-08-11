@@ -96,6 +96,10 @@ class AbsensiApiController extends Controller
             'accuracy'         => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
 
+        if (isset($data['is_mock_location']) && (bool) $data['is_mock_location']) {
+            abort(422, 'Penggunaan aplikasi Lokasi Palsu (Fake GPS) terdeteksi. Silakan nonaktifkan Fake GPS terlebih dahulu.');
+        }
+
         $hariIni    = now()->toDateString();
         $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();
 
@@ -201,6 +205,10 @@ class AbsensiApiController extends Controller
             'is_mock_location' => ['sometimes', 'nullable', 'boolean'],
             'accuracy'         => ['sometimes', 'nullable', 'numeric', 'min:0'],
         ]);
+
+        if (isset($data['is_mock_location']) && (bool) $data['is_mock_location']) {
+            abort(422, 'Penggunaan aplikasi Lokasi Palsu (Fake GPS) terdeteksi. Silakan nonaktifkan Fake GPS terlebih dahulu.');
+        }
 
         $hariIni    = now()->toDateString();
         $shiftToday = $pegawai->jadwalShift()->whereDate('tanggal', $hariIni)->first();

@@ -180,10 +180,26 @@ class CutiApiController extends Controller
 
         AuditLog::catat('mengajukan cuti (mobile)', 'Cuti', $cuti->id, $pegawai->nama);
 
-        // Send FCM Notification to Atasan if exists
-        if ($pegawai->atasan && $pegawai->atasan->user) {
-            $jenisStr = ($cuti->jenisCuti && $cuti->jenisCuti->nama) ? $cuti->jenisCuti->nama : ucfirst($cuti->jenis_cuti ?? 'cuti');
-            $tglStr = $cuti->tanggal_mulai->format('d M') . ' s.d. ' . $cuti->tanggal_selesai->format('d M Y');
+        $jenisStr = ($cuti->jenisCuti && $cuti->jenisCuti->nama) ? $cuti->jenisCuti->nama : ucfirst($cuti->jenis_cuti ?? 'cuti');
+        $tglStr = $cuti->tanggal_mulai->format('d M') . ' s.d. ' . $cuti->tanggal_selesai->format('d M Y');
+
+        // 1. Notifikasi konfirmasi ke Pegawai (pemohon)
+        if ($pegawai->user) {
+            \App\Services\NotificationService::sendToUser(
+                $pegawai->user,
+                'Pengajuan Cuti Berhasil Dikirim',
+                "Pengajuan cuti {$jenisStr} Anda ({$tglStr}) telah terkirim dan sedang menunggu persetujuan Atasan.",
+                ['type' => 'cuti', 'id' => (string) $cuti->id]
+            );
+        }
+
+        // 2. Notifikasi ke Atasan (HANYA jika atasan ada dan BERBEDA akun dengan pemohon)
+        if (
+            $pegawai->atasan &&
+            $pegawai->atasan->user &&
+            $pegawai->atasan->user_id !== $pegawai->user_id &&
+            $pegawai->atasan->id !== $pegawai->id
+        ) {
             \App\Services\NotificationService::sendToUser(
                 $pegawai->atasan->user,
                 'Pengajuan Cuti Tim Baru',

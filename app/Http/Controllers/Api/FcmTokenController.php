@@ -39,4 +39,28 @@ class FcmTokenController extends Controller
             'message' => 'Token FCM berhasil didaftarkan.',
         ]);
     }
+
+    /**
+     * Remove user FCM device token upon logout.
+     * Endpoint: DELETE /api/fcm-token
+     */
+    public function destroy(Request $request)
+    {
+        $user = $request->user();
+        $token = $request->input('token');
+
+        if ($token) {
+            $tokenHash = hash('sha256', $token);
+            FcmToken::where('user_id', $user->id)
+                ->where('token_hash', $tokenHash)
+                ->delete();
+        } else {
+            FcmToken::where('user_id', $user->id)->delete();
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Token FCM berhasil dihapus.',
+        ]);
+    }
 }

@@ -195,17 +195,36 @@ class CutiController extends Controller
         // Audit log
         \App\Models\AuditLog::catat('membuat pengajuan cuti', 'Cuti', $cuti->id, $cuti->pegawai->nama ?? null);
 
-        // Send FCM Notification to Atasan if exists
+        // Notifikasi Cuti
         $pegawaiPemohon = $cuti->pegawai;
-        if ($pegawaiPemohon && $pegawaiPemohon->atasan && $pegawaiPemohon->atasan->user) {
+        if ($pegawaiPemohon) {
             $jenisStr = ($cuti->jenisCuti && $cuti->jenisCuti->nama) ? $cuti->jenisCuti->nama : ucfirst($cuti->jenis_cuti);
             $tglStr = $cuti->tanggal_mulai->format('d M') . ' s.d. ' . $cuti->tanggal_selesai->format('d M Y');
-            \App\Services\NotificationService::sendToUser(
-                $pegawaiPemohon->atasan->user,
-                'Pengajuan Cuti Tim Baru',
-                "{$pegawaiPemohon->nama} mengajukan cuti {$jenisStr} ({$tglStr}) yang memerlukan persetujuan Anda.",
-                ['type' => 'cuti', 'id' => (string) $cuti->id]
-            );
+
+            // 1. Notifikasi konfirmasi ke Pegawai (pemohon)
+            if ($pegawaiPemohon->user) {
+                \App\Services\NotificationService::sendToUser(
+                    $pegawaiPemohon->user,
+                    'Pengajuan Cuti Berhasil Dikirim',
+                    "Pengajuan cuti {$jenisStr} Anda ({$tglStr}) telah terkirim dan sedang menunggu persetujuan Atasan.",
+                    ['type' => 'cuti', 'id' => (string) $cuti->id]
+                );
+            }
+
+            // 2. Notifikasi ke Atasan (HANYA jika atasan ada dan BERBEDA akun dengan pemohon)
+            if (
+                $pegawaiPemohon->atasan &&
+                $pegawaiPemohon->atasan->user &&
+                $pegawaiPemohon->atasan->user_id !== $pegawaiPemohon->user_id &&
+                $pegawaiPemohon->atasan->id !== $pegawaiPemohon->id
+            ) {
+                \App\Services\NotificationService::sendToUser(
+                    $pegawaiPemohon->atasan->user,
+                    'Pengajuan Cuti Tim Baru',
+                    "{$pegawaiPemohon->nama} mengajukan cuti {$jenisStr} ({$tglStr}) yang memerlukan persetujuan Anda.",
+                    ['type' => 'cuti', 'id' => (string) $cuti->id]
+                );
+            }
         }
 
         return redirect()->route('cuti.index')

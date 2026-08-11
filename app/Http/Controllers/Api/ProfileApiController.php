@@ -47,6 +47,17 @@ class ProfileApiController extends Controller
 
         AuditLog::catat('mengajukan perubahan data (mobile)', 'PengajuanPerubahanData', $pengajuan->id, $pegawai->nama);
 
+        // Notifikasi konfirmasi ke Pegawai (pemohon)
+        if ($request->user()) {
+            $fieldLabel = str_replace('_', ' ', $data['field']);
+            \App\Services\NotificationService::sendToUser(
+                $request->user(),
+                'Pengajuan Perubahan Data Dikirim',
+                "Permohonan perubahan data ({$fieldLabel}) Anda telah terkirim dan sedang menunggu verifikasi Admin.",
+                ['type' => 'perubahan_data', 'id' => (string) $pengajuan->id]
+            );
+        }
+
         return response()->json(['message' => 'Pengajuan perubahan data terkirim, menunggu persetujuan Admin.'], 201);
     }
 

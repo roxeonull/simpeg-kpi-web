@@ -111,6 +111,31 @@ class RiwayatApiController extends Controller
 
         AuditLog::catat('menambah riwayat pelatihan (mobile)', 'RiwayatPelatihan', $pegawai->id, $pegawai->nama);
 
+        // 1. Notifikasi konfirmasi ke Pegawai (pemohon)
+        if ($pegawai->user) {
+            \App\Services\NotificationService::sendToUser(
+                $pegawai->user,
+                'Usulan Diklat Berhasil Dikirim',
+                "Usulan diklat '{$pelatihan->nama_pelatihan}' Anda telah terkirim dan sedang menunggu verifikasi.",
+                ['type' => 'pelatihan', 'id' => (string) $pelatihan->id]
+            );
+        }
+
+        // 2. Notifikasi ke Atasan (HANYA jika atasan ada dan BERBEDA akun dengan pemohon)
+        if (
+            $pegawai->atasan &&
+            $pegawai->atasan->user &&
+            $pegawai->atasan->user_id !== $pegawai->user_id &&
+            $pegawai->atasan->id !== $pegawai->id
+        ) {
+            \App\Services\NotificationService::sendToUser(
+                $pegawai->atasan->user,
+                'Usulan Diklat Pegawai Baru',
+                "{$pegawai->nama} mengusulkan diklat '{$pelatihan->nama_pelatihan}' yang memerlukan verifikasi.",
+                ['type' => 'pelatihan', 'id' => (string) $pelatihan->id]
+            );
+        }
+
         return response()->json([
             'message' => 'Riwayat pelatihan berhasil ditambahkan dan menunggu verifikasi.',
             'data' => [

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProfileApiController;
 use App\Http\Controllers\Api\RiwayatApiController;
 use App\Http\Controllers\Api\DinasLuarApiController;
 use App\Http\Controllers\Api\FcmTokenController;
+use App\Http\Controllers\Api\NotificationApiController;
 use Illuminate\Support\Facades\Route;
 
 // ── Auth (tanpa middleware) ──────────────────────────────────────────────────
@@ -22,9 +23,15 @@ Route::post('/forgot-password/reset-password', [AuthController::class, 'resetPas
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth & Device FCM
-    Route::post('/logout',    [AuthController::class, 'logout']);
-    Route::get('/me',         [AuthController::class, 'me']);
-    Route::post('/fcm-token', [FcmTokenController::class, 'store']);
+    Route::post('/logout',     [AuthController::class, 'logout']);
+    Route::get('/me',          [AuthController::class, 'me']);
+    Route::post('/fcm-token',  [FcmTokenController::class, 'store']);
+    Route::delete('/fcm-token', [FcmTokenController::class, 'destroy']);
+
+    // Notifikasi (Server-side)
+    Route::get('/notifications',           [NotificationApiController::class, 'index']);
+    Route::post('/notifications/{id}/read', [NotificationApiController::class, 'markAsRead']);
+    Route::post('/notifications/read-all',  [NotificationApiController::class, 'markAllAsRead']);
 
     // Dashboard
     Route::get('/dashboard', [DashboardApiController::class, 'index']);

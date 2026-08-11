@@ -64,10 +64,26 @@ class DinasLuarApiController extends Controller
             'status'                  => 'pending',
         ]);
 
-        // Send FCM Notification to Atasan
-        if ($pegawai->atasan && $pegawai->atasan->user) {
-            $jenisStr = $dinasLuar->jenisKetidakhadiran?->nama ?? 'Dinas Luar';
-            $tglStr = \Carbon\Carbon::parse($dinasLuar->tanggal_mulai)->format('d M') . ' s.d. ' . \Carbon\Carbon::parse($dinasLuar->tanggal_selesai)->format('d M Y');
+        $jenisStr = $dinasLuar->jenisKetidakhadiran?->nama ?? 'Dinas Luar';
+        $tglStr = \Carbon\Carbon::parse($dinasLuar->tanggal_mulai)->format('d M') . ' s.d. ' . \Carbon\Carbon::parse($dinasLuar->tanggal_selesai)->format('d M Y');
+
+        // 1. Notifikasi konfirmasi ke Pegawai (pemohon)
+        if ($pegawai->user) {
+            \App\Services\NotificationService::sendToUser(
+                $pegawai->user,
+                'Pengajuan Dinas Luar Berhasil Dikirim',
+                "Pengajuan {$jenisStr} Anda ({$tglStr}) di {$dinasLuar->lokasi_tugas} telah terkirim dan sedang menunggu persetujuan Atasan.",
+                ['type' => 'dinas_luar', 'id' => (string) $dinasLuar->id]
+            );
+        }
+
+        // 2. Notifikasi ke Atasan (HANYA jika atasan ada dan BERBEDA akun dengan pemohon)
+        if (
+            $pegawai->atasan &&
+            $pegawai->atasan->user &&
+            $pegawai->atasan->user_id !== $pegawai->user_id &&
+            $pegawai->atasan->id !== $pegawai->id
+        ) {
             \App\Services\NotificationService::sendToUser(
                 $pegawai->atasan->user,
                 '📋 Pengajuan Dinas Luar / WFA Baru',
