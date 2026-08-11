@@ -13,7 +13,12 @@ use Illuminate\Http\Request;
 
 class AbsensiApiController extends Controller
 {
-    public function __construct(private AbsensiStatusService $statusService) {}
+    private $statusService;
+
+    public function __construct(AbsensiStatusService $statusService)
+    {
+        $this->statusService = $statusService;
+    }
 
     public function index(Request $request)
     {
@@ -67,6 +72,11 @@ class AbsensiApiController extends Controller
             ->whereDate('tanggal_selesai', '>=', $todayStr)
             ->first();
 
+        $dinasLuarNama = 'Dinas Luar / Tugas Khusus';
+        if ($dinasLuarAktif && $dinasLuarAktif->jenisKetidakhadiran) {
+            $dinasLuarNama = $dinasLuarAktif->jenisKetidakhadiran->nama ?? 'Dinas Luar / Tugas Khusus';
+        }
+
         return response()->json([
             'data'                   => $absensi ? $this->format($absensi) : null,
             'jam_masuk_kantor'       => $jamMasukKantor,
@@ -78,7 +88,7 @@ class AbsensiApiController extends Controller
             'office_radius_meters'   => (float) Pengaturan::get('radius_gps', 100),
             'is_dinas_luar_aktif'    => $dinasLuarAktif !== null,
             'bypass_geofence'        => $dinasLuarAktif !== null,
-            'dinas_luar_nama'        => $dinasLuarAktif?->jenisKetidakhadiran?->nama ?? 'Dinas Luar / Tugas Khusus',
+            'dinas_luar_nama'        => $dinasLuarNama,
         ]);
     }
 
@@ -111,6 +121,18 @@ class AbsensiApiController extends Controller
 
         $existing = $pegawai->absensi()->whereDate('tanggal', $hariIni)->first();
         abort_if($existing && $existing->jam_masuk, 422, 'Anda sudah presensi masuk hari ini.');
+
+        $dinasLuarAktif = \App\Models\DinasLuar::where('pegawai_id', $pegawai->id)
+            ->where('status', 'disetujui')
+            ->whereDate('tanggal_mulai', '<=', $hariIni)
+            ->whereDate('tanggal_selesai', '>=', $hariIni)
+            ->exists();
+
+        abort_if(
+            ($existing && $existing->status === 'izin') || $dinasLuarAktif,
+            422,
+            'Hari ini Anda memiliki status Dinas Luar / Izin yang disetujui. Presensi masuk tidak dapat dilakukan.'
+        );
 
         $wfhEnabled = (bool) Pengaturan::get('wfh_enabled', '1');
         $wfhDays = json_decode(Pengaturan::get('wfh_days', '["friday"]'), true) ?? ['friday'];
@@ -154,11 +176,11 @@ class AbsensiApiController extends Controller
         $accuracy = isset($data['accuracy']) ? (float) $data['accuracy'] : null;
 
         [$flagReview, $catatanFlag] = $this->evaluasiGpsFlag(
-            isMock   : $isMock,
-            accuracy : $accuracy,
-            pegawai  : $pegawai,
-            lat      : (float) $data['latitude'],
-            lng      : (float) $data['longitude'],
+            $isMock,
+            $accuracy,
+            $pegawai,
+            (float) $data['latitude'],
+            (float) $data['longitude']
         );
 
         if ($wfhFlagNote) {
@@ -316,7 +338,7 @@ class AbsensiApiController extends Controller
         ?float  $accuracy,
         $pegawai,
         float   $lat,
-        float   $lng,
+        float   $lng
     ): array {
         $flags = [];
 

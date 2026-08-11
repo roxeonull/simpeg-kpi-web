@@ -34,6 +34,29 @@ class DashboardApiController extends Controller
             ->whereDate('tanggal', now()->toDateString())
             ->first();
 
+        $todayStr = now()->toDateString();
+        $dinasLuarAktif = \App\Models\DinasLuar::with('jenisKetidakhadiran')
+            ->where('pegawai_id', $pegawai->id)
+            ->where('status', 'disetujui')
+            ->whereDate('tanggal_mulai', '<=', $todayStr)
+            ->whereDate('tanggal_selesai', '>=', $todayStr)
+            ->first();
+
+        $dinasLuarTerbaru = \App\Models\DinasLuar::with('jenisKetidakhadiran')
+            ->where('pegawai_id', $pegawai->id)
+            ->orderByDesc('id')
+            ->limit(3)
+            ->get()
+            ->map(fn ($dl) => [
+                'id' => $dl->id,
+                'jenis_ketidakhadiran_nama' => ($dl->jenisKetidakhadiran && $dl->jenisKetidakhadiran->nama) ? $dl->jenisKetidakhadiran->nama : 'Dinas Luar',
+                'tanggal_mulai' => is_object($dl->tanggal_mulai) ? $dl->tanggal_mulai->format('Y-m-d') : (string) $dl->tanggal_mulai,
+                'tanggal_selesai' => is_object($dl->tanggal_selesai) ? $dl->tanggal_selesai->format('Y-m-d') : (string) $dl->tanggal_selesai,
+                'lokasi_tugas' => $dl->lokasi_tugas,
+                'alasan' => $dl->alasan,
+                'status' => $dl->status,
+            ]);
+
         return response()->json([
             'absensi_hari_ini' => $absensiHariIni ? [
                 'jam_masuk' => $absensiHariIni->jam_masuk,
@@ -54,6 +77,15 @@ class DashboardApiController extends Controller
                 'alpa' => (clone $absensiBulanIni)->where('status', 'alpa')->count(),
             ],
             'cuti_terbaru' => $cutiTerbaru,
+            'dinas_luar_aktif' => $dinasLuarAktif ? [
+                'id' => $dinasLuarAktif->id,
+                'jenis_ketidakhadiran_nama' => ($dinasLuarAktif->jenisKetidakhadiran && $dinasLuarAktif->jenisKetidakhadiran->nama) ? $dinasLuarAktif->jenisKetidakhadiran->nama : 'Dinas Luar',
+                'tanggal_mulai' => is_object($dinasLuarAktif->tanggal_mulai) ? $dinasLuarAktif->tanggal_mulai->format('Y-m-d') : (string) $dinasLuarAktif->tanggal_mulai,
+                'tanggal_selesai' => is_object($dinasLuarAktif->tanggal_selesai) ? $dinasLuarAktif->tanggal_selesai->format('Y-m-d') : (string) $dinasLuarAktif->tanggal_selesai,
+                'lokasi_tugas' => $dinasLuarAktif->lokasi_tugas,
+                'alasan' => $dinasLuarAktif->alasan,
+            ] : null,
+            'dinas_luar_terbaru' => $dinasLuarTerbaru,
         ]);
     }
 }
