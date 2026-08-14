@@ -60,6 +60,11 @@ class DinasLuarWebController extends Controller
         $user = $request->user();
         $dinasLuar = DinasLuar::findOrFail($id);
 
+        if ($user->role === 'atasan' && $user->pegawai) {
+            $bawahanIds = Pegawai::where('atasan_id', $user->pegawai->id)->pluck('id')->toArray();
+            abort_unless(in_array($dinasLuar->pegawai_id, $bawahanIds, true), 403, 'Pengajuan ini bukan dari anggota tim Anda.');
+        }
+
         $dinasLuar->update([
             'status'         => 'disetujui',
             'approved_by'     => $user->id,
@@ -88,6 +93,11 @@ class DinasLuarWebController extends Controller
     {
         $user = $request->user();
         $dinasLuar = DinasLuar::findOrFail($id);
+
+        if ($user->role === 'atasan' && $user->pegawai) {
+            $bawahanIds = Pegawai::where('atasan_id', $user->pegawai->id)->pluck('id')->toArray();
+            abort_unless(in_array($dinasLuar->pegawai_id, $bawahanIds, true), 403, 'Pengajuan ini bukan dari anggota tim Anda.');
+        }
 
         $dinasLuar->update([
             'status'         => 'ditolak',

@@ -19,12 +19,18 @@ class CutiController extends Controller
         }
 
         // Hitung total status aktual dari DB sebelum memfilter pencarian / jenis
-        $countQuery = clone $query;
+        $statRow = (clone $query)->selectRaw("
+            COUNT(*) as semua,
+            SUM(CASE WHEN status IN ('menunggu_atasan', 'menunggu_hr') THEN 1 ELSE 0 END) as menunggu,
+            SUM(CASE WHEN status = 'disetujui' THEN 1 ELSE 0 END) as disetujui,
+            SUM(CASE WHEN status = 'ditolak' THEN 1 ELSE 0 END) as ditolak
+        ")->first();
+
         $counts = [
-            'semua' => (clone $countQuery)->count(),
-            'menunggu' => (clone $countQuery)->whereIn('status', ['menunggu_atasan', 'menunggu_hr'])->count(),
-            'disetujui' => (clone $countQuery)->where('status', 'disetujui')->count(),
-            'ditolak' => (clone $countQuery)->where('status', 'ditolak')->count(),
+            'semua' => (int) ($statRow->semua ?? 0),
+            'menunggu' => (int) ($statRow->menunggu ?? 0),
+            'disetujui' => (int) ($statRow->disetujui ?? 0),
+            'ditolak' => (int) ($statRow->ditolak ?? 0),
         ];
 
         if ($status = $request->get('status')) {
@@ -72,8 +78,10 @@ class CutiController extends Controller
         ]);
     }
 
-    public function show(Cuti $cuti)
+    public function show(Request $request, Cuti $cuti)
     {
+        $this->authorizeAtasan($request, $cuti);
+
         $cuti->load(['pegawai.unit', 'atasanPemroses', 'hrPemroses', 'approvalSteps.pemrosesUser']);
 
         return view('cuti.show', ['cuti' => $cuti]);

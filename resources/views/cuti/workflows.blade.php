@@ -51,15 +51,15 @@
         </div>
 
         {{-- Default Workflow Information Card --}}
-        <div class="rounded-2xl border border-kpi-gold/30 bg-gradient-to-r from-amber-500/5 via-kpi-gold/5 to-transparent p-4 dark:border-kpi-gold/20">
+        <div class="rounded-2xl border border-kpi-gold/30 bg-amber-500/5 p-4 dark:border-kpi-gold/20 dark:bg-kpi-gold/10">
             <div class="flex items-start gap-3">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-kpi-gold/10 text-kpi-gold">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-kpi-gold/20 text-kpi-gold dark:bg-kpi-gold/30">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-kpi-black dark:text-stone-200">Default Workflow (Standard Fallback)</h4>
-                    <p class="mt-0.5 text-xs text-kpi-gray leading-relaxed">
-                        Unit kerja yang belum diatur workflow khususnya akan otomatis menggunakan alur standar 2 tahap: <strong class="text-stone-700 dark:text-stone-300">Atasan Langsung &rarr; HR / Admin</strong>.
+                    <h4 class="text-sm font-semibold text-kpi-black dark:text-stone-100">Default Workflow (Standard Fallback)</h4>
+                    <p class="mt-0.5 text-xs text-kpi-gray dark:text-stone-400 leading-relaxed">
+                        Unit kerja yang belum diatur workflow khususnya akan otomatis menggunakan alur standar 2 tahap: <strong class="text-stone-800 dark:text-stone-200">Atasan Langsung &rarr; HR / Admin</strong>.
                     </p>
                 </div>
             </div>
@@ -68,11 +68,11 @@
         {{-- Workflow Cards List --}}
         @if ($workflows->isEmpty())
             <div class="card flex flex-col items-center justify-center py-12 text-center">
-                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-kpi-red-soft text-kpi-red mb-3">
+                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-kpi-red-soft text-kpi-red dark:bg-kpi-red/20 mb-3">
                     <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 </div>
                 <h3 class="text-base font-semibold text-kpi-black dark:text-stone-100">Belum ada workflow custom</h3>
-                <p class="mt-1 text-sm text-kpi-gray max-w-sm">Semua unit kerja saat ini masih memakai workflow default (Atasan Langsung &rarr; HR).</p>
+                <p class="mt-1 text-sm text-kpi-gray dark:text-stone-400 max-w-sm">Semua unit kerja saat ini masih memakai workflow default (Atasan Langsung &rarr; HR).</p>
                 <button @click="openCreateModal()" class="btn-secondary mt-4">
                     + Buat Workflow Pertama
                 </button>
@@ -89,7 +89,7 @@
                                     </div>
                                     <div>
                                         <h3 class="font-bold text-base text-kpi-black dark:text-stone-100">{{ $wf->nama }}</h3>
-                                        <p class="text-xs text-kpi-gray">
+                                        <p class="text-xs text-kpi-gray dark:text-stone-400">
                                             {{ $wf->unit?->nama_unit ?? 'Semua Unit' }} &middot; <span class="font-medium text-stone-700 dark:text-stone-300">{{ $wf->steps->count() }} approval levels</span>
                                         </p>
                                     </div>
@@ -111,7 +111,7 @@
 
                             {{-- Approval Flow Visual Preview --}}
                             <div class="mt-6 border-t border-kpi-line pt-4 dark:border-white/10">
-                                <p class="text-[11px] font-bold tracking-wider text-kpi-gray uppercase mb-3">APPROVAL FLOW</p>
+                                <p class="text-[11px] font-bold tracking-wider text-kpi-gray dark:text-stone-400 uppercase mb-3">APPROVAL FLOW</p>
                                 <div class="flex items-center gap-2 overflow-x-auto pb-2">
                                     @foreach ($wf->steps as $idx => $step)
                                         <div class="flex items-center gap-2 shrink-0">
@@ -131,7 +131,7 @@
                                                 </span>
                                             </div>
                                             @if (!$loop->last)
-                                                <div class="flex items-center justify-center text-kpi-gray/60 mb-5">
+                                                <div class="flex items-center justify-center text-kpi-gray/60 dark:text-stone-500 mb-5">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                                                 </div>
                                             @endif
@@ -156,7 +156,7 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0">
             
-            <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-kpi-dark-surface border border-kpi-line dark:border-white/10 my-8"
+            <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-stone-900 border border-kpi-line dark:border-white/10 my-8"
                  @click.away="closeModal()">
                 
                 {{-- Modal Header --}}
@@ -175,24 +175,24 @@
                     </template>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray mb-1">Workflow Name</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray dark:text-stone-300 mb-1">Workflow Name</label>
                         <input type="text" name="nama" x-model="form.nama" placeholder="e.g. Standard Approval, Workflow Sales" class="input w-full" required>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray mb-1">Unit Kerja / Department</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray dark:text-stone-300 mb-1">Unit Kerja / Department</label>
                         <select name="unit_id" x-model="form.unit_id" class="input w-full" required>
                             <option value="">-- Pilih Unit Kerja --</option>
                             @foreach ($units as $u)
                                 <option value="{{ $u->id }}">{{ $u->nama_unit }} ({{ $u->kode_unit }})</option>
                             @endforeach
                         </select>
-                        <p class="mt-1 text-[11px] text-kpi-gray">Satu unit kerja hanya boleh memiliki 1 workflow khusus yang aktif.</p>
+                        <p class="mt-1 text-[11px] text-kpi-gray dark:text-stone-400">Satu unit kerja hanya boleh memiliki 1 workflow khusus yang aktif.</p>
                     </div>
 
                     {{-- Dynamic Approval Steps --}}
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray mb-2">Approval Steps</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-kpi-gray dark:text-stone-300 mb-2">Approval Steps</label>
                         
                         <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
                             <template x-for="(step, index) in form.steps" :key="index">

@@ -31,13 +31,20 @@ class AtasanApiController extends Controller
 
         $cutis = $query->latest('created_at')->get()->map(fn ($c) => $this->format($c));
 
+        $statRow = Cuti::whereIn('pegawai_id', $timIds)->selectRaw("
+            COUNT(*) as semua,
+            SUM(CASE WHEN status_atasan = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
+            SUM(CASE WHEN status_atasan = 'disetujui' THEN 1 ELSE 0 END) as disetujui,
+            SUM(CASE WHEN status_atasan = 'ditolak' THEN 1 ELSE 0 END) as ditolak
+        ")->first();
+
         return response()->json([
             'data' => $cutis,
             'counts' => [
-                'menunggu' => Cuti::whereIn('pegawai_id', $timIds)->where('status_atasan', 'menunggu')->count(),
-                'disetujui' => Cuti::whereIn('pegawai_id', $timIds)->where('status_atasan', 'disetujui')->count(),
-                'ditolak' => Cuti::whereIn('pegawai_id', $timIds)->where('status_atasan', 'ditolak')->count(),
-                'semua' => Cuti::whereIn('pegawai_id', $timIds)->count(),
+                'menunggu' => (int) ($statRow->menunggu ?? 0),
+                'disetujui' => (int) ($statRow->disetujui ?? 0),
+                'ditolak' => (int) ($statRow->ditolak ?? 0),
+                'semua' => (int) ($statRow->semua ?? 0),
             ],
         ]);
     }

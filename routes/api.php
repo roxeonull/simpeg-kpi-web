@@ -51,17 +51,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cuti/{cuti}',        [CutiApiController::class, 'show']);
 
     // Approval Cuti Atasan
-    Route::get('/atasan/cuti-tim',           [AtasanApiController::class, 'cutiTim']);
-    Route::patch('/atasan/cuti/{cuti}/setujui', [AtasanApiController::class, 'setujuiCuti']);
-    Route::patch('/atasan/cuti/{cuti}/tolak',   [AtasanApiController::class, 'tolakCuti']);
+    Route::middleware('role:atasan,admin')->group(function () {
+        Route::get('/atasan/cuti-tim',           [AtasanApiController::class, 'cutiTim']);
+        Route::patch('/atasan/cuti/{cuti}/setujui', [AtasanApiController::class, 'setujuiCuti']);
+        Route::patch('/atasan/cuti/{cuti}/tolak',   [AtasanApiController::class, 'tolakCuti']);
+
+        Route::get('/atasan/dinas-luar-tim',         [DinasLuarApiController::class, 'teamRequests']);
+        Route::patch('/atasan/dinas-luar/{id}/setujui', [DinasLuarApiController::class, 'setujui']);
+        Route::patch('/atasan/dinas-luar/{id}/tolak',   [DinasLuarApiController::class, 'tolak']);
+    });
 
     // Dinas Luar / WFA
     Route::get('/jenis-ketidakhadiran',          [DinasLuarApiController::class, 'options']);
     Route::get('/dinas-luar',                    [DinasLuarApiController::class, 'index']);
     Route::post('/dinas-luar',                   [DinasLuarApiController::class, 'store']);
-    Route::get('/atasan/dinas-luar-tim',         [DinasLuarApiController::class, 'teamRequests']);
-    Route::patch('/atasan/dinas-luar/{id}/setujui', [DinasLuarApiController::class, 'setujui']);
-    Route::patch('/atasan/dinas-luar/{id}/tolak',   [DinasLuarApiController::class, 'tolak']);
 
     // Riwayat
     Route::get('/riwayat/pendidikan',        [RiwayatApiController::class, 'pendidikan']);

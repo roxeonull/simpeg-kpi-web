@@ -97,12 +97,20 @@ class DashboardController extends Controller
             $days = 6;
         }
 
-        $grafikMingguan = collect(range($days, 0))->map(function ($i) use ($scopePegawaiIds, $periode) {
+        $startDate = now()->subDays($days)->startOfDay();
+        $endDate = now()->endOfDay();
+
+        $attendanceCounts = Absensi::when($scopePegawaiIds, fn ($q) => $q->whereIn('pegawai_id', $scopePegawaiIds))
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->whereIn('status', ['hadir', 'telat'])
+            ->selectRaw('DATE(tanggal) as tgl, COUNT(*) as total')
+            ->groupBy('tgl')
+            ->pluck('total', 'tgl');
+
+        $grafikMingguan = collect(range($days, 0))->map(function ($i) use ($attendanceCounts, $periode) {
             $tanggal = now()->subDays($i);
-            $hadir = Absensi::when($scopePegawaiIds, fn ($q) => $q->whereIn('pegawai_id', $scopePegawaiIds))
-                ->whereDate('tanggal', $tanggal->toDateString())
-                ->whereIn('status', ['hadir', 'telat'])
-                ->count();
+            $dateKey = $tanggal->toDateString();
+            $hadir = (int) ($attendanceCounts[$dateKey] ?? 0);
 
             return [
                 'label' => in_array($periode, ['30', 'bulan_ini']) ? $tanggal->format('d/m') : $tanggal->translatedFormat('D'),
